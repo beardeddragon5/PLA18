@@ -1,7 +1,7 @@
 /********************* symbol.cxx ************************/
 
 
-/* enth�lt Funktionen zum Erzeugen einer Symboltabelle,
+/* enthält Funktionen zum Erzeugen einer Symboltabelle,
 Eintragen eines Bezeichners, Suchen eines Bezeichners in der
 Symboltabelle und Ausgabe der Symboltabelle */
 
@@ -36,18 +36,18 @@ symtable* create_newsym() {
 
   newsym = new symtable;		/* Neue ST erzeugen */
   newsym->precsym = actsym;		/* Zeiger auf akt. ST eintragen */
-  newsym->anzahl = 0;			/* Zahl der Eintr�ge initialisieren */
-  newsym->level = level+1;		/* Blockniveau erh�hen */
+  newsym->anzahl = 0;			/* Zahl der Einträge initialisieren */
+  newsym->level = level+1;		/* Blockniveau erhöhen */
   return(newsym);
 }
 
 /********** Suchen eines Bezeichners (char *s) in der gesamten Symboltabelle *************/
-/* Die Suche beginnt in der aktuellen Block geh�renden Symboltabelle (actsym),
-und weiter in den Symboltabellen der �bergeordneten Bl�cke.
-Wird der Bezeichner gefunden, wird ein Zeiger auf den zugeh�rigen
+/* Die Suche beginnt in der aktuellen Block gehörenden Symboltabelle (actsym),
+und weiter in den Symboltabellen der Übergeordneten Blöckee.
+Wird der Bezeichner gefunden, wird ein Zeiger auf den zugehörigen
 Symbolotabelleneintrag zurückgeliefert; wird der Name nicht gefunden NULL */
 
-/* Sucht Name s in der aktuellen und �bergeordneten ST */
+/* Sucht Name s in der aktuellen und Übergeordneten ST */
 st_entry* lookup( char *s ) {
   int i;
 	symtable* sptr;				/* ST-Zeiger */
@@ -72,7 +72,7 @@ st_entry* lookup( char *s ) {
 /********** Suchen eines Bezeichners (char *s) in der lokalen  Symboltabelle *************/
 /* Ein Bezeichner wird in der lokal gültigen (aktuellen = actsym) ST gesucht.
 Die Funktion wird verwendet bei Deklarationen, um Doppeldeklarationen aufzudecken.
-Wird der Bezeichner gefunden, wird ein Zeiger auf den zugeh�rigen
+Wird der Bezeichner gefunden, wird ein Zeiger auf den zugehörigen
 Symboltabelleneintrag zurückgeliefert (== Fehlerfall); wird der Name nicht gefunden NULL */
 
 /* Sucht Name s in der aktuellen ST */
@@ -81,7 +81,7 @@ st_entry* lookup_in_actsym (char *s) {
 	/* Durchsuche Einträge in actsym */
 	for ( i =0; i < actsym->anzahl; i++) {
     if (strcmp (actsym->eintrag[i].name, s) == 0) {
-      /* Name gefunden --> Zeiger auf ST-Eintrag zur�ckliefern */
+      /* Name gefunden --> Zeiger auf ST-Eintrag zurückliefern */
       return(&actsym->eintrag[i]);
     }
 	}
@@ -91,7 +91,7 @@ st_entry* lookup_in_actsym (char *s) {
 
 
 
-/********** Neuen Eintrag der Art tok in ST einf�gen  *************/
+/********** Neuen Eintrag der Art tok in ST einfügen  *************/
 
 /*************
 
@@ -115,9 +115,9 @@ st_entry* insert(int tok) {
 
 	len = strlen(idname); 			/* Länge des Namens bestimmen */
 
-	if (actsym->anzahl >= SYMMAX)	/* MAximale Gr�sse �berschritten ? */
+	if (actsym->anzahl >= SYMMAX)	/* MAximale Grösse Überschritten ? */
 		error(28);
-	if (lastchar +len+1 >= STRMAX)	/* L�nge des Stringpuffers �berschritten ?*/
+	if (lastchar +len+1 >= STRMAX)	/* Länge des Stringpuffers Überschritten ?*/
 		error(29);
 
 	strcpy(lexemes+lastchar+1,idname);  /* Name in Feld lexemes ablegen */
@@ -125,7 +125,7 @@ st_entry* insert(int tok) {
 	/* Eintrag zusammenstellen */
   neu.token = tok;					/* Art eintragen */
   neu.name = &lexemes[lastchar +1];	/* Zeiger auf Namen eintragen */
-  lastchar = lastchar + len + 1;		/* Character-Zahl erh�hen */
+  lastchar = lastchar + len + 1;		/* Character-Zahl erhöhen */
   neu.subsym = NULL;					/* Zeiger auf Unter-ST initialisieren */
   neu.wertaddr = 0;             		/* wertaddr initialisieren  */
 
@@ -151,7 +151,7 @@ st_entry* insert(int tok) {
 	 		break;
 
 		default:	/* falsche Eintragsart */
-			errortext("falsche Eintragsrt in Symboltabelle\n");
+			errortext( "falsche Eintragsrt in Symboltabelle\n" );
 			break;
   }
 	actsym->eintrag[actsym->anzahl] = neu; /* Neuen Eintrag in ST eintragen */
@@ -159,7 +159,7 @@ st_entry* insert(int tok) {
 	/* Zeiger auf Eintrag bestimmen */
   lastentry = &(actsym->eintrag[actsym->anzahl]);
 
-	/* Anzahl der Eintr�ge erh�hen */
+	/* Anzahl der Einträge erhöhen */
   actsym->anzahl++;
 
 	/* Testausgabe */
@@ -174,7 +174,7 @@ void printsymtab(symtable *sptr) {
   int i;
 	st_entry *act;
 
-	fsym << "\nAnzahl der Eintr�ge:" << sptr->anzahl << "\n";
+	fsym << "\nAnzahl der Einträge:" << sptr->anzahl << "\n";
 	fsym << "Blockniveau:" << sptr->level << "\n";
 
   /* alle Einträge der ST ausgeben */

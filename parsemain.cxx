@@ -10,7 +10,7 @@
 #endif
 
 
-// Mainprogramm f�r Parser
+// Mainprogramm für Parser
 
 int main(int argc, char** argv) {
 	// Compiler  intialisieren

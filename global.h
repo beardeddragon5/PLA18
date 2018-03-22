@@ -14,16 +14,16 @@ using namespace std;
 
 #define TRUE			1
 #define FALSE			0
-#define BSIZE			512			/* Puffergr�sse */
-#define NONE		 	-1		/* Vorbesetzung f�r num */
+#define BSIZE			512			/* Puffergrösse */
+#define NONE		 	-1		/* Vorbesetzung für num */
 #define EOS			 	'\0'		/* End of String */
 
-#define NESTMAX		10			/* Max. Schachtelungstiefe von Bl�cken */
-#define STRMAX		999			/* L�nge des Stringfeldes */
-#define SYMMAX		20			/* Gr��e der Teil-Symboltabelle */
+#define NESTMAX		10			/* Max. Schachtelungstiefe von Blöckeen */
+#define STRMAX		999			/* Länge des Stringfeldes */
+#define SYMMAX		20			/* Größe der Teil-Symboltabelle */
 
 
-/* Definition der Codierung f�r Tokentypen */
+/* Definition der Codierung für Tokentypen */
 
 
 #define INTNUM	 	2561			/* Int-Konstante */
@@ -31,8 +31,8 @@ using namespace std;
 
 
 #define ID  			257			/* Identifikator */
-#define CONST 		258			/* Schl�sselwort const */
-#define VAR  			259			/* Schl�sselwort var */
+#define CONST 		258			/* Schlüsselwort const */
+#define VAR  			259			/* Schlüsselwort var */
 #define PROCEDURE	260			/* Procedure */
 #define CALL 			261			/* call */
 #define BEGIN 		262			/* begin */
@@ -66,7 +66,7 @@ using namespace std;
 
 #define DONE			300			/* Ende-Token */
 
-/* Definition der Art der Symboltabellen-Eintr�ge  */
+/* Definition der Art der Symboltabellen-Einträge  */
 
 #define KONST 			310			/* Konstanten-Eintrag */
 #define INTIDENT  	320			/* Identifikator vom Typ int  */
@@ -91,10 +91,10 @@ struct st_entry {
 /* Aufbau der (Teil- )Symboltabelle */
 
 struct symtable {
-	symtable * precsym;				/* Zeiger auf �bergeordnete Symboltabelle; bei oberster NULL */
+	symtable * precsym;				/* Zeiger auf Übergeordnete Symboltabelle; bei oberster NULL */
 	int level;								/* Schachtelungstiefe  */
-	int anzahl;								/* Anzahl der Symboltabelleneintr�ge */
-	st_entry eintrag[SYMMAX];	/* Feld f�r Eintr�ge */
+	int anzahl;								/* Anzahl der Symboltabelleneinträge */
+	st_entry eintrag[SYMMAX];	/* Feld für Einträge */
 };
 
 extern ifstream fin;
@@ -109,7 +109,7 @@ extern int lineno;					/* Zeilennummer */
 extern symtable *actsym,		/* Zeiger auf aktuelle Symboltabelle */
 		*firstsym;							/* Zeiger auf oberste (globale) Symboltabelle */
 
-extern int tracesw;					/* Kennung, ob Trace gew�nscht */
+extern int tracesw;					/* Kennung, ob Trace gewünscht */
 
 
 /******************** Prototypen für Prozeduren *******************/
@@ -145,7 +145,7 @@ void block( symtable * neusym);		/* Bearbeiten eines Blockes */
 
 
 void error(int);								/* Fehlerausgabe */
-void errortext(char * );				/* Fehlerausgabe */
-void warningtext(char * );			/* Warnung ausgeben */
+void errortext(string);				/* Fehlerausgabe */
+void warningtext(string);			/* Warnung ausgeben */
 // void generate(int);					/* Codeerzeugung */
 void printsymtab(symtable *);		/* Ausgabe der Symboltabelle */

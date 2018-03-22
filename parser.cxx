@@ -34,7 +34,7 @@ int factor() {
 			lookahead=nextsymbol();
 			exp();
 			if(lookahead== KLZU)
-				// korrekt ; n�chstes Symbol lesen --> Ende
+				// korrekt ; nächstes Symbol lesen --> Ende
 				lookahead = nextsymbol();
 			else
 				error(27); // kein Faktor
@@ -93,50 +93,33 @@ int factor() {
 } 	// end factor
 
 
-
-
-
-
-
-
-
 /******************  term ***************************************************/
 /* analysiert wird der korrekte Aufbau eines Terms nach folgender Syntax:
 
 			TERM	::=		FACTOR  { '*' FACTOR |  '/' FACTOR }*
 
 Schnittstelle:
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 							Typ des Terms ist Funktionswert
 
 */
-
-
-int term()
-{	 int ret;
+int term() {
+  int ret;
 
 	if (tracesw)
-	    trace<<"\n Zeile:"<< lineno<<"Term:";
-
-
+    trace << "\n Zeile:" << lineno << "Term:";
 	ret = factor();
 	// korrekter Factor
 
-	while(lookahead == MULT || lookahead ==DIV)
-		// solange * oder / folgt, muss Factor kommen
-
-		{// n�chstes Symbol lesen
-		 lookahead=nextsymbol();
-			ret = factor();
-
-
-		}
+	while(lookahead == MULT || lookahead == DIV) {
+	  // solange * oder / folgt, muss Factor kommen
+    // nächstes Symbol lesen
+	  lookahead=nextsymbol();
+		ret = factor();
+	}
 	return(0);
- }	// end term
-
-
-
+ }
 
 /******************  exp ***************************************************/
 /* analysiert wird der korrekte Aufbau eines Ausdrucks nach folgender Syntax:
@@ -144,13 +127,11 @@ int term()
 			EXPRESSION	::=		TERM { '+' TERM |  '-' TERM}*
 
 Schnittstelle:
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 							Funktionswert ist Typ des Ausdrucks
 */
-
-int exp()
-{
+int exp() {
 	int typ_left,typ_right;
 	if (tracesw)
 	    trace<<"\n Zeile:"<< lineno<<"Ausdruck";
@@ -158,21 +139,16 @@ int exp()
 	typ_left = term();
 	// korrekter Term
 
-	while (lookahead == PLUS || lookahead == MINUS )
-			// solange + oder - folgt, muss Term kommen
-
-		{// n�chstes Symbol lesen
-		 lookahead=nextsymbol();
-		 // Term pr�fen
-		 typ_right = term();
-		 // nach korrektem Ende wurde n�chstes Symbol gelesen
-
-		}
+	while (lookahead == PLUS || lookahead == MINUS ) {
+		// solange + oder - folgt, muss Term kommen
+    // nächstes Symbol lesen
+		lookahead=nextsymbol();
+		// Term prüfen
+		typ_right = term();
+		// nach korrektem Ende wurde nächstes Symbol gelesen
+	}
 	return (0);
-}	// end exp
-
-
-
+}
 
 /******************  condition ***************************************************/
 /* analysiert wird der korrekte Aufbau einer Bedingung nach folgender Syntax:
@@ -180,36 +156,28 @@ int exp()
 			CONDITION	::=		EXPRESSION  RELOP  EXPRESSION
 
 Schnittstelle:
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
-
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 */
-
-int condition()
-
-{   int typ_left, typ_right;
-
+int condition() {
+  int typ_left, typ_right;
 
 	if (tracesw)
 	    trace<<"\n Zeile:"<< lineno<<"Condition";
 
-
 	typ_left = exp();
 	// korrekter Ausdruck
 	// relationaler Operator muss folgen
-
-	switch(lookahead)
-	{
+	switch(lookahead) {
 		case EQ:
 		case NE:
 		case LT:
 		case LE:
 		case GT:
-		case GE:// n�chstes Symbol lesen
+		case GE:// nächstes Symbol lesen
 				lookahead=nextsymbol();
 				// Ausdruck muss folgen
 				typ_right = exp();
-
 				break;
 
 		default: // kein relationaler Operator
@@ -219,10 +187,7 @@ int condition()
 		errortext("Typen der Operanden nicht kompatibel");
 
 	return(typ_left);
-}  // end condition
-
-
-
+}
 
 /****************** statement ***************************************************/
 /* analysiert wird der korrekte Aufbau eines Statements nach folgender Syntax:
@@ -236,53 +201,19 @@ int condition()
 
 
 Schnittstelle:
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-
-
-
-void statement()
-{
+void statement() {
   st_entry *found;		// Zeiger auf ST-Eintrag
   int typ_left, typ_right;
 
   if (tracesw)
       trace<<"\n Zeile:"<< lineno<<"Statement";
 
-
-  // �berpr�fung des aktuellen lex. Symbols
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // überprüfung des aktuellen lex. Symbols
+  // TODO
   return;	// end statement
 }
 
@@ -297,56 +228,22 @@ nach folgender Syntax:
 
 
 Schnittstelle:
-	bei Aufruf :			erkannt wurde das Schl�sselwort procedure
-							n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			erkannt wurde das Schlüsselwort procedure
+							nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
+void procdecl() {
+  st_entry* neu, *found;          // Zeiger auf ST-Eintrag
 
+  symtable* neusym;		// Zeiger auf Symboltabelle
 
+  if (tracesw)
+	  trace<<"\n Zeile:"<< lineno<<"Procdeklaration:";
 
-void procdecl()
-
-
-{  st_entry * neu, *found;          // Zeiger auf ST-Eintrag
-
-   symtable * neusym;		// Zeiger auf Symboltabelle
-
-
-   if (tracesw)
-	    trace<<"\n Zeile:"<< lineno<<"Procdeklaration:";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   return;   // end procdecl
+  // TODO
+  return;   // end procdecl
 }
-
 
 
 /****************** vardecl ***************************************************/
@@ -357,59 +254,21 @@ nach folgender Syntax:
 
 
 Schnittstelle:
-	bei Aufruf :			erkannt wurde das Schl�sselwort var
-							n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			erkannt wurde das Schlüsselwort var
+							nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-
-
-
-void vardecl()
-
-{ st_entry * neu, *found;
+void vardecl() {
+  st_entry* neu, *found;
 
   if (tracesw)
-	    trace<<"\n Zeile:"<< lineno<<"Variablendeklaration:";
-
+	    trace << "\n Zeile:" << lineno << "Variablendeklaration:";
 
 	// nach var muss Identifikator folgen
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-return ;	// ende vardecl
-
+  // TODO
+  return;
 }
-
-
-
-
-
-
-
 
 /****************** constdecl ***************************************************/
 /* analysiert wird der korrekte Aufbau einer Variablendeklaration
@@ -420,50 +279,20 @@ nach folgender Syntax:
 
 
 Schnittstelle:
-	bei Aufruf :			erkannt wurde das Schl�sselwort const
-							n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			erkannt wurde das Schlüsselwort const
+							nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-
-
-
-
-void constdecl()
-
-
-{  st_entry *neu, *found;
+void constdecl() {
+  st_entry *neu, *found;
 
 	if (tracesw)
 	    trace<<"\n Zeile:"<< lineno<<"Konstantendeklaration:";
 
 	// auf const muss IDENT folgen
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-return;		// end constdecl
-
-
+  // TODO
+  return;		// end constdecl
 }
 
 
@@ -484,60 +313,32 @@ return;		// end constdecl
 Der Parameter neusym ist ein Zeiger auf die Symboltabelle des zu
 analysierenden Blockes
 ===>
-		�ussersten (globalen)  Block:		firstsym
-		bei Prozeduren:		Zeiger auf neu angelegte ST f�r Prozedur
+		Äussersten (globalen)  Block:		firstsym
+		bei Prozeduren:		Zeiger auf neu angelegte ST für Prozedur
 
 Zu Beginn muss der globale Zeiger actsym auf die neue ST gesetzt werden
 Vor Verlassen muss actsym wieder auf den vorigen Wert gesetzt werden
 
 
 Schnittstelle:
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 
 */
-
-
-
-
-void block(symtable * neusym)
-
 /* symtable * neusym :	Zeiger auf neue ST */
-
-
-{
-    if (tracesw)
-	trace<<"\n Zeile:"<< lineno<<"Block";
+void block(symtable * neusym) {
+  if (tracesw)
+	  trace<<"\n Zeile:"<< lineno<<"Block";
 
 	// actsym auf neue Symboltabelle setzen
 
+  // TODO
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// bei Blockende : Symboltabelle zur�cksetzen
+	// bei Blockende : Symboltabelle zurücksetzen
 	// actsym = Zeiger auf vorherige Symboltabelle
-
-
-
-
-
-
-
-return;		// end block
+  // TODO
+  return;
 }
 
 
@@ -547,26 +348,16 @@ return;		// end block
 /****************** program    ***************************************************/
 /* analysiert wird der korrekte Aufbau eines Programmes nach folgender Syntax:
 
-
 			PROGRAM		::=		BLOCK	'$'
 
-
-
-
 Schnittstelle:
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-
-
-
-void program()
-{
-
+void program() {
   if (tracesw)
-	  trace<<"\n Zeile:"<< lineno<<"Programm";
-
+	  trace <<"\n Zeile:"<< lineno<<"Programm";
 
 	// globale Symboltabelle  anlegen (firstsym
 	firstsym = create_newsym();
@@ -579,9 +370,8 @@ void program()
 
 	//  nach Block muss '$' folgen
 	if (lookahead == PROGEND)
-		// n�chstes Symbol lesen
+		// nächstes Symbol lesen
 		lookahead=nextsymbol();
-
 	else
 		 // korrektes Programmende fehlt
 		 error(31);
@@ -589,5 +379,4 @@ void program()
 	// Dateiende erreicht ?
 	if (lookahead != DONE)
 		error (33); // noch Symbole in Eingabedatei nach RPOGRAM
-
 }	// end program

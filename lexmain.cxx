@@ -20,7 +20,7 @@
 int main(int argc, char** argv) {
 	int lookahead = -1;
 
-	/* Initialisierungen der lexikalischen Analyse durchf�hren */
+	/* Initialisierungen der lexikalischen Analyse durchführen */
 	initialize(argc, argv);
 
 	/* 1. Symbol lesen  */

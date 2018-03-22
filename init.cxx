@@ -2,7 +2,7 @@
 
 
 
-/* Initialisierungen f�r Compiler PLA
+/* Initialisierungen für Compiler PLA
 
 		Stand Sommersemester 2018
 
@@ -14,18 +14,18 @@
 #include "global.h"
 #endif
 
-ifstream fin;					/* Zu �bersetzende Eingaben */
+ifstream fin;					/* Zu Übersetzende Eingaben */
 ostream fout(nullptr),					/* Ausgabedatei */
 	 ferr(nullptr),					/* Fehlerausgaben */
-	 fsym(nullptr),					/* Ausgabe f�r Symboltabelle */
-	 trace(nullptr);					/* Ausgabe f�r Trace */
+	 fsym(nullptr),					/* Ausgabe für Symboltabelle */
+	 trace(nullptr);					/* Ausgabe für Trace */
 
 int tracesw;
 int level=0;
 
 #define MAX_SWITCH_LENGTH 10
 
-/***************** Initialisierungen durchf�hren ******************/
+/***************** Initialisierungen durchführen ******************/
 
 /**
 * Print help to stdout and stop program.
@@ -153,7 +153,7 @@ void initialize( int argc, char** argv ) {
 		newInitalize( argc, argv );
 		return;
 	}
-	
+
   char c;
   char filename[20];
 

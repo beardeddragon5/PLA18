@@ -21,7 +21,7 @@ char idname[BSIZE];      /* Name eines Bezeichners ; wird vom Parser weiterverwe
 char actchar;       /* gelesenes Zeichen */
 
 
-/*  Um Bezeichner von reservierten Symbolene unterscheiden zu k�nnen,
+/*  Um Bezeichner von reservierten Symbolene unterscheiden zu können,
 wird eine Tabelle reservierte Worte verwendet (restable).
 
 Die Tabelle enthält Einträge für jedes Schlüsselwort, bestehend aus
@@ -38,25 +38,25 @@ Bezeichner vor.
 /* Struktur eines Eintrags in der Tabelle reservierter Symbole */
 struct ressw {
   char ressymbol [RWSYMLEN];			/* Symbol */
-  int token;							/* zugeh�riger Tokentyp */
+  int token;							/* zugehöriger Tokentyp */
 };
 
 /* Tabelle reservierter Worte */
 struct ressw restable [] = {
-  "const", CONST,
-	"var", VAR,
-	"procedure", PROCEDURE,
-	"call", CALL,
-	"begin", BEGIN,
-	"end", END,
-	"if", IF,
-	"then", THEN,
-	"else",ELSE,
-	"while",WHILE,
-	"do", DO,
-	"int", INT,
-	"real", REAL,
-	"fi", FI
+  {"const", CONST},
+	{"var", VAR},
+	{"procedure", PROCEDURE},
+	{"call", CALL},
+	{"begin", BEGIN},
+	{"end", END},
+	{"if", IF},
+	{"then", THEN},
+	{"else",ELSE},
+	{"while",WHILE},
+	{"do", DO},
+	{"int", INT},
+	{"real", REAL},
+	{"fi", FI}
 };
 
 /* Suchen nach einem reservierten Symbol */
@@ -124,8 +124,8 @@ int nextsymbol() {
 
     /***** actchar ist Ziffer --> Konstanten erkennen  *****/
 		} else if ( isdigit(actchar) ) {
-			char zahl [BSIZE];		/* Puffer für Ziffern */
-			int b = 0;				/* Zeichenzahl*/
+			char zahl [BSIZE];	 /* Puffer für Ziffern */
+			int b = 0;				   /* Zeichenzahl*/
 
       // TODO
 

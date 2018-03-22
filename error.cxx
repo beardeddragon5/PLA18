@@ -1,14 +1,14 @@
 /****************** error.cxx *************************/
-/* enth�lt eine Reihe von Fehlertexten, die �ber ihre
-Nummer verwendet werden k�nnen und jederzeit erweitert
-werden k�nnen.
+/* enthält eine Reihe von Fehlertexten, die über ihre
+Nummer verwendet werden können und jederzeit erweitert
+werden können.
 
 Zur Ausgabe der Fehlertexte wird die Funktion
 
 	error ( int nr)
 
-verwendet, der die Fehlernummer zu �bergeben ist.
-Die Funktion error f�hrt ein exit durch.
+verwendet, der die Fehlernummer zu übergeben ist.
+Die Funktion error fährt ein exit durch.
 
 Alternativ kann die Funktion
 
@@ -39,7 +39,7 @@ string errtxt[] = {
 /*8*/	"Wiederholung erwartet",
 /*9*/	"Falsche Benutzung eines Symbols in Statement",
 /*10*/	"Identifikator nicht deklariert",
-/*11*/	"Keine Zuweisungen an Konstante oder Prozedurnamen zul�ssig",
+/*11*/	"Keine Zuweisungen an Konstante oder Prozedurnamen zulässig",
 /*12*/	"Wertzuweisungsoperator ist ':=' ",
 /*13*/	"Nach call ist Identifikator erwartet ",
 /*14*/	"Konstante oder Variable in call nicht erlaubt",
@@ -79,12 +79,12 @@ void error( int nr ) {
 }
 
 /* Funktion gibt den angegebenen  Fehlertext aus */
-void errortext ( string text) {
+void errortext( string text) {
 	ferr << "Zeile" << lineno << text << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Warnungstext aus */
-void warningtext ( string text ) {
+void warningtext( string text ) {
 	ferr << "Zeile" << lineno << text << endl;
 }
