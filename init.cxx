@@ -2,10 +2,10 @@
 
 
 
-/* Initialisierungen für Compiler PLA  
+/* Initialisierungen fï¿½r Compiler PLA
 
 		Stand Sommersemester 2018
-		
+
 
 */
 
@@ -13,92 +13,92 @@
 
 
 
-#ifndef GLOBAL_H 
+#ifndef GLOBAL_H
 #include "global.h"
-#endif 
+#endif
 
 
-ifstream fin;					/* Zu übersetzende Eingaben */ 
+ifstream fin;					/* Zu ï¿½bersetzende Eingaben */
 ofstream fout,					/* Ausgabedatei */
 	 ferr,					/* Fehlerausgaben */
-	 fsym,					/* Ausgabe für Symboltabelle */
-	 trace;					/* Ausgabe für Trace */
+	 fsym,					/* Ausgabe fï¿½r Symboltabelle */
+	 trace;					/* Ausgabe fï¿½r Trace */
 
 
 
 int tracesw;
-int level=0; 
+int level=0;
 
-/***************** Initialisierungen durchführen ******************/ 
+/***************** Initialisierungen durchfï¿½hren ******************/
 
 void initialize()
-{ 
+{
   char c;
-  char filename[20]; 
+  char filename[20];
 
-  
-  cout <<"\n Name der Eingabedatei eingeben-->"; 
-  cin >> filename; 
-  
-  /* Eingabefile öffnen*/
-  fin.open(filename, ios::in);  
-    
- // fin.open( "pla_input", ios::in);  
 
- cout << "\n Name der Ausgabedatei eingeben-->"; 
- cin >> filename; 
+  cout <<"\n Name der Eingabedatei eingeben-->";
+  cin >> filename;
 
-  /* Ausgabedatei öffnen */ 
+  /* Eingabefile ï¿½ffnen*/
+  fin.open(filename, ios::in);
+
+ // fin.open( "pla_input", ios::in);
+
+ cout << "\n Name der Ausgabedatei eingeben-->";
+ cin >> filename;
+
+  /* Ausgabedatei ï¿½ffnen */
   fout.open(filename,ios::out);
-  
-  
+
+
 //  fout.open("pla_ou",ios::out);
-  
-    fout<<"\n\n***************** Ausgabe ***************\n"; 
-  
-  
-    	                      
- cout<<"\n Name der Fehlerdatei eingeben-->"; 
- cin >>  filename; 
-  
-  /* Fehlerdatei öffnen */ 
+
+    fout<<"\n\n***************** Ausgabe ***************\n";
+
+
+
+ cout<<"\n Name der Fehlerdatei eingeben-->";
+ cin >>  filename;
+
+  /* Fehlerdatei ï¿½ffnen */
   ferr.open(filename,ios::out);
-  
-  
+
+
 //  ferr.open("err.txt",ios::out);
 
   ferr<<"\n\n**************** Fehlermeldungen*************\n";
-  
-  
 
-  cout<<"\n Trace gewünscht ? (y/n): "; 
+
+
+  cout<<"\n Trace gewï¿½nscht ? (y/n): ";
   cin>> c;
-  if ( c == 'y')                  
-     { /* Datei für Trace  öffnen */
+  if ( c == 'y')
+     { /* Datei fï¿½r Trace  ï¿½ffnen */
        trace.open("trace.out",ios::out);
-       tracesw = TRUE; 
+       tracesw = TRUE;
       }
-  else tracesw = FALSE;              
+  else tracesw = FALSE;
 
 
 
-	/* Datei für Symboltabellenausgabe öffnen */   	  
-	
+	/* Datei fï¿½r Symboltabellenausgabe ï¿½ffnen */
+
   fsym.open("symtable.out",ios::out);
-  
+
   fsym<<"\n\n**************** Symboltabellen*************\n";
-  
+
 
 
  /* Initialisieren des Scanners */
-  initlexan(); 
-  
-  
+  initlexan();
+
+
  }
 
 
 
-/************ Endebehandlung bei fehlerfreier Übersetzung  *****/
+/************ Endebehandlung bei fehlerfreier ï¿½bersetzung  *****/
 /* zur Zeit nur Ausgabe der Symboltabelle */
 
 
@@ -109,7 +109,3 @@ void stop()
   printsymtab(firstsym);
 
 }
-
-
-
- 

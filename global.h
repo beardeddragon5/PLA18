@@ -1,42 +1,42 @@
 /**************** global.h  - SS 2018    ************/
 
-#ifndef GLOBAL_H 
-#define GLOBAL_H 
+#ifndef GLOBAL_H
+#define GLOBAL_H
 #endif
 
 #include <stdlib.h>
-#include <iostream> 
+#include <iostream>
 #include <fstream>
-#include <ctype.h> 
+#include <ctype.h>
 #include <string.h>
-using namespace std; 
+using namespace std;
 
 #define TRUE		1
 #define FALSE		0
-#define BSIZE		512			/* Puffergrösse */ 
-#define NONE		  -1		/* Vorbesetzung für num */ 
+#define BSIZE		512			/* Puffergrï¿½sse */
+#define NONE		  -1		/* Vorbesetzung fï¿½r num */
 #define EOS			 '\0'		/* End of String */
 
-#define NESTMAX		 10			/* Max. Schachtelungstiefe von Blöcken */ 
-#define STRMAX		999			/* Länge des Stringfeldes */
-#define SYMMAX		 20			/* Größe der Teil-Symboltabelle */
+#define NESTMAX		 10			/* Max. Schachtelungstiefe von Blï¿½cken */
+#define STRMAX		999			/* Lï¿½nge des Stringfeldes */
+#define SYMMAX		 20			/* Grï¿½ï¿½e der Teil-Symboltabelle */
 
 
-/* Definition der Codierung für Tokentypen */ 
+/* Definition der Codierung fï¿½r Tokentypen */
 
 
-#define INTNUM	 	2561			/* Int-Konstante */ 
-#define REALNUM	 	2562			/* Real-Konstante */ 
+#define INTNUM	 	2561			/* Int-Konstante */
+#define REALNUM	 	2562			/* Real-Konstante */
 
 
-#define ID  		257			/* Identifikator */ 
-#define CONST 		258			/* Schlüsselwort const */
-#define VAR  		259			/* Schlüsselwort var */ 
+#define ID  		257			/* Identifikator */
+#define CONST 		258			/* Schlï¿½sselwort const */
+#define VAR  		259			/* Schlï¿½sselwort var */
 #define PROCEDURE	260			/* Procedure */
-#define CALL 		261			/* call */ 
+#define CALL 		261			/* call */
 #define BEGIN 		262			/* begin */
 #define END   		263			/* end */
-#define IF  		264			/* if */ 
+#define IF  		264			/* if */
 #define THEN 		2651		/* then */
 #define ELSE		2652		/* else */
 #define WHILE 		266			/* while */
@@ -57,9 +57,9 @@ using namespace std;
 #define KLAUF		281			/* (  */
 #define KLZU		282			/* )  */
 #define PROGEND		283			/*  $ */
-#define COLON		284			/*  :  */ 
+#define COLON		284			/*  :  */
 #define INT			285			/* int */
-#define REAL		286			/* real */ 
+#define REAL		286			/* real */
 #define FI 			291			/* fi */
 
 
@@ -67,12 +67,12 @@ using namespace std;
 
 
 
-/* Definition der Art der Symboltabellen-Einträge  */ 
+/* Definition der Art der Symboltabellen-Eintrï¿½ge  */
 
 
-#define KONST 		310			/* Konstanten-Eintrag */ 
-#define INTIDENT  	320			/* Identifikator vom Typ int  */ 
-#define REALIDENT  	330			/* Identifikator vom Typ real */ 
+#define KONST 		310			/* Konstanten-Eintrag */
+#define INTIDENT  	320			/* Identifikator vom Typ int  */
+#define REALIDENT  	330			/* Identifikator vom Typ real */
 #define PROC		400			/* Procedure */
 
 
@@ -85,33 +85,33 @@ using namespace std;
 
 
 
-/* Symboltabelle  */ 
-struct symtable ;	
+/* Symboltabelle  */
+struct symtable ;
 
 
 
-/* Aufbau eines Symboltabellen-Eintrags */ 
+/* Aufbau eines Symboltabellen-Eintrags */
 
-struct st_entry 
+struct st_entry
 	{  	int token ;					/* Art des Eintrags (KONST/INTIDENT/REALIDENT/PROC)  */
 	   	char *name;					/* Zeiger auf Namen */
-	   	int wertaddr;				/* Wert bei Konstanten (KONST); 
+	   	int wertaddr;				/* Wert bei Konstanten (KONST);
 									   relative Speicheradresse (offset) bei Variablen */
-	   	symtable * subsym;			/* Zeiger auf Teil-Symboltabelle bei Art PROC */ 
+	   	symtable * subsym;			/* Zeiger auf Teil-Symboltabelle bei Art PROC */
 	};
 
 
 
 
-/* Aufbau der (Teil- )Symboltabelle */ 	
+/* Aufbau der (Teil- )Symboltabelle */
 
 
 struct symtable
-	{ symtable * precsym;			/* Zeiger auf übergeordnete Symboltabelle; 
+	{ symtable * precsym;			/* Zeiger auf ï¿½bergeordnete Symboltabelle; 
 										bei oberster NULL */
 	  int level;					/* Schachtelungstiefe  */
-	  int anzahl;					/* Anzahl der Symboltabelleneinträge */
-	  st_entry eintrag[SYMMAX];		/* Feld für Einträge */ 
+	  int anzahl;					/* Anzahl der Symboltabelleneintrï¿½ge */
+	  st_entry eintrag[SYMMAX];		/* Feld fï¿½r Eintrï¿½ge */
 	};
 
 
@@ -119,64 +119,64 @@ struct symtable
 
 
 
-extern ifstream fin; 
-extern ofstream fout, ferr, fsym, trace; 
+extern ifstream fin;
+extern ofstream fout, ferr, fsym, trace;
 
-extern int level; 
+extern int level;
 
-extern char idname[];				/* Zeiger auf Namen bei Identifikator */ 
+extern char idname[];				/* Zeiger auf Namen bei Identifikator */
 extern int num;					/* Wert einer integer-Konstanten/ Zahl */
 extern double realnum; 				/* Wert einer Real-Konstanten */
-extern int lineno;				/* Zeilennummer */ 
+extern int lineno;				/* Zeilennummer */
 extern symtable *actsym,			/* Zeiger auf aktuelle Symboltabelle */
-		*firstsym;			/* Zeiger auf oberste (globale) Symboltabelle */ 
+		*firstsym;			/* Zeiger auf oberste (globale) Symboltabelle */
 
-extern int tracesw;					/* Kennung, ob Trace gewünscht */ 
-
-
+extern int tracesw;					/* Kennung, ob Trace gewï¿½nscht */
 
 
 
-/******************** Prototypen für Prozeduren *******************/
+
+
+/******************** Prototypen fï¿½r Prozeduren *******************/
 
 
 
 
 void initialize();					/* Compiler initialisieren */
-void stop(); 						/* Beenden */ 
+void stop(); 						/* Beenden */
 
 
 void initlexan();					/* Scanner initialisieren */
 int lookforres( char * );			/* sucht in Tabelle der
-									   res. Symbole nach Zeichenkette */ 
-int nextsymbol(); 					/* liest nächstes Symbol der Eingabe */ 
-					 
+									   res. Symbole nach Zeichenkette */
+int nextsymbol(); 					/* liest nï¿½chstes Symbol der Eingabe */
 
 
-symtable * create_newsym() ;		/* Neue ST erzeugen */ 
-st_entry * lookup( char *s);		/* Namen in ganzer Symboltabelle suchen */  
-st_entry * lookup_in_actsym ( char *s);	
-									/* Namen in aktueller Symboltabelle suchen */  
-st_entry * insert(int);   			/* Neuen Eintrag in actsym erzeugen */ 
+
+symtable * create_newsym() ;		/* Neue ST erzeugen */
+st_entry * lookup( char *s);		/* Namen in ganzer Symboltabelle suchen */
+st_entry * lookup_in_actsym ( char *s);
+									/* Namen in aktueller Symboltabelle suchen */
+st_entry * insert(int);   			/* Neuen Eintrag in actsym erzeugen */
 
 
 
 
 void constdecl();					/* Verarbeiten einer Konstantendeklaration */
-void vardecl(); 					/* Verarbeiten einer VAriablendeklaration */ 
-void procdecl(); 					/* Verarbeiten einer Prozedurdeklaration */ 
-int factor(); 						/* Verarbeiten eines Faktors */ 
-int term();						/* Verarbeiten eines Terms */ 
-int exp(); 						/* Verarbeiten eines Ausdrucks */ 
-int condition(); 					/* Verarbeiten einer Bedingung */ 
-void statement();					/* Verarbeiten Statement */ 
-void program(); 					/* Programm übersetzen */ 
-void block( symtable * neusym);		/* Bearbeiten eines Blockes */ 
+void vardecl(); 					/* Verarbeiten einer VAriablendeklaration */
+void procdecl(); 					/* Verarbeiten einer Prozedurdeklaration */
+int factor(); 						/* Verarbeiten eines Faktors */
+int term();						/* Verarbeiten eines Terms */
+int exp(); 						/* Verarbeiten eines Ausdrucks */
+int condition(); 					/* Verarbeiten einer Bedingung */
+void statement();					/* Verarbeiten Statement */
+void program(); 					/* Programm ï¿½bersetzen */
+void block( symtable * neusym);		/* Bearbeiten eines Blockes */
 
 
 
 void error(int);					/* Fehlerausgabe */
 void errortext(char * );			/* Fehlerausgabe */
 void warningtext(char * );			/* Warnung ausgeben */
-// void generate(int);					/* Codeerzeugung */ 
-void printsymtab(symtable *);		/* Ausgabe der Symboltabelle */ 
+// void generate(int);					/* Codeerzeugung */
+void printsymtab(symtable *);		/* Ausgabe der Symboltabelle */

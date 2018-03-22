@@ -1,18 +1,18 @@
 /****************** error.cxx *************************/
-/* enthält eine Reihe von Fehlertexten, die über ihre
-Nummer verwendet werden können und jederzeit erweitert
-werden können. 
+/* enthï¿½lt eine Reihe von Fehlertexten, die ï¿½ber ihre
+Nummer verwendet werden kï¿½nnen und jederzeit erweitert
+werden kï¿½nnen.
 
-Zur Ausgabe der Fehlertexte wird die Funktion 
+Zur Ausgabe der Fehlertexte wird die Funktion
 
-	error ( int nr) 
+	error ( int nr)
 
-verwendet, der die Fehlernummer zu übergeben ist.
-Die Funktion error führt ein exit durch. 
+verwendet, der die Fehlernummer zu ï¿½bergeben ist.
+Die Funktion error fï¿½hrt ein exit durch.
 
-Alternativ kann die Funktion 
+Alternativ kann die Funktion
 
-	errortext (char *) 
+	errortext (char *)
 
 verwendet werden, die den angegebenen Text ausgibt
 
@@ -21,11 +21,11 @@ verwendet werden, die den angegebenen Text ausgibt
 
 *****************************************************/
 
-#ifndef GLOBAL_H 
+#ifndef GLOBAL_H
 #include "global.h"
-#endif 
+#endif
 
-                                          
+
 /***************** Fehlertexte **********************/
 
 
@@ -42,7 +42,7 @@ char * errtxt[]=
 /*8*/	"Wiederholung erwartet",
 /*9*/	"Falsche Benutzung eines Symbols in Statement",
 /*10*/	"Identifikator nicht deklariert",
-/*11*/	"Keine Zuweisungen an Konstante oder Prozedurnamen zulässig",
+/*11*/	"Keine Zuweisungen an Konstante oder Prozedurnamen zulï¿½ssig",
 /*12*/	"Wertzuweisungsoperator ist ':=' ",
 /*13*/	"Nach call ist Identifikator erwartet ",
 /*14*/	"Konstante oder Variable in call nicht erlaubt",
@@ -55,57 +55,56 @@ char * errtxt[]=
 /*21*/	" ')' fehlt ",
 /*22*/	" Symbol nach Faktor nicht erlaubt",
 /*23*/	"Ausdruck darf nicht mit diesem Symbol beginnen",
-/*24*/	"Zahl zu groß ",
-/*25*/	"Programm zu groß",
+/*24*/	"Zahl zu groï¿½ ",
+/*25*/	"Programm zu groï¿½",
 /*26*/	"Prozedurschachtelung zu tief",
 /*27*/	"kein Faktor: Name oder Konstante oder ( E) ",
 /*28*/	" Symboltabelle voll",
 /*29*/	"Lexemfeld voll",
 /*30*/	"Statement erwartet" ,
 /*31*/	"Korrektes Programmende fehlt",
-/*32*/	" unzulässiges Eingabezeichen (Scanner)",
+/*32*/	" unzulï¿½ssiges Eingabezeichen (Scanner)",
 /*33*/   "Nach PROGRAM noch Symbole in Eingabedatei",
 /*34*/	"Identifikator doppelt deklariert",
 /*35*/	"Doppelpunkt erwartet",
-/*36*/	"Unzulässiger Typ",
+/*36*/	"Unzulï¿½ssiger Typ",
 /*37*/  "Falsche Eintragsart in Symboltabelle",
 /*38*/	"Keine korrekte reelle Konstante ",
 /*39 */	" fi fehlt"
 };
 
 
-	
-	
+
+
 /***************** Fehlerfunktion **********************/
 
-                                          
-                                          
-void error( int nr) 
+
+
+void error( int nr)
 /* Funktion gibt den der Nummer nr entsprechenden Fehlertext aus */
 {
-	ferr<< "Zeile" << lineno << errtxt[nr]; 
+	ferr<< "Zeile" << lineno << errtxt[nr];
 
-	exit(1); 
+	exit(1);
 }
 
 
 
-void errortext ( char * text) 
+void errortext ( char * text)
 /* Funktion gibt den angegebenen  Fehlertext aus */
 {
-	ferr<< "Zeile" << lineno << text; 
-	
-	exit(1); 
+	ferr<< "Zeile" << lineno << text;
+
+	exit(1);
 }
 
 
 
 
 
-void warningtext ( char * text) 
+void warningtext ( char * text)
 /* Funktion gibt den angegebenen  Warnungstext aus */
 {
-	ferr<< "Zeile" << lineno << text; 
-	
-}
+	ferr<< "Zeile" << lineno << text;
 
+}
