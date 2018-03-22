@@ -1,4 +1,4 @@
-   
+
 /**************** parser.cxx  Sommersemester 2018******************/
 
 /*******   **************/
@@ -7,9 +7,7 @@
 #include "global.h"
 #endif
 
-
-int lookahead;					/* lookahead enth�lt n�chsten EIngabetoken */
-
+int lookahead;					/* lookahead enthält nächsten Eingabetoken */
 
 int exp();
 int nextsymbol();
@@ -18,109 +16,79 @@ int nextsymbol();
 /******************  factor  **********************************************/
 /* analysiert wird der korrekte Aufbau eines Faktors
 
-
-
 Schnittstelle:
-
-	bei Aufruf :			n�chstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		n�chstes Eingabesymbol befindet sich in lookahead
-
-
-
-
+	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 */
-
-
-
-int factor()
- {	int kind;
-    	st_entry *found;		// Zeiger auf Eintrag in ST
+int factor() {
+  int kind;
+  st_entry *found;		// Zeiger auf Eintrag in ST
 	int factor_typ;
 
 	if (tracesw)
-	trace<<"\n Zeile:"<< lineno<<"	Faktor";
+	 trace << "\n Zeile:" << lineno << "	Faktor";
 
-
-	switch(lookahead)	// je nach n�chstem Eingabesymbol in lookahead
-	{
+  // je nach nächstem Eingabesymbol in lookahead
+	switch(lookahead) {
 		case KLAUF:	/* Symbol '(' folgt --> (EXPRESSION) erwartet*/
-
-					lookahead=nextsymbol();
-					exp();
-					if(lookahead== KLZU)
-						// korrekt ; n�chstes Symbol lesen --> Ende
-						lookahead = nextsymbol();
-					else
-						error(27); // kein Faktor
-					break;
-
+			lookahead=nextsymbol();
+			exp();
+			if(lookahead== KLZU)
+				// korrekt ; n�chstes Symbol lesen --> Ende
+				lookahead = nextsymbol();
+			else
+				error(27); // kein Faktor
+			break;
 
 		case INTNUM:
-		 			/* Int-Zahl (INTNUMBER) gefunden --> okay */
-					lookahead=nextsymbol();
-
-					break;
-
+ 			/* Int-Zahl (INTNUMBER) gefunden --> okay */
+			lookahead=nextsymbol();
+			break;
 
 		case REALNUM: 		/* Real-Zahl (REALNUMBER) gefunden --> okay */
-					lookahead=nextsymbol();
-
-					break;
-
-
+			lookahead=nextsymbol();
+			break;
 
 		case ID:	/* Identifikator (ID) gefunden  */
-					/* Suche Identifikator in Symboltabelle ;
-						angewandtes Auftreten -->
-						Deklaration muss vorhanden sein
-						und also Eintrag in ST */
+			/* Suche Identifikator in Symboltabelle ;
+				angewandtes Auftreten -->
+				Deklaration muss vorhanden sein
+				und also Eintrag in ST */
 
-					found = lookup(idname);
+			found = lookup(idname);
 
+      /* nicht gefunden --> Fehler: Id nicht deklariert*/
+			if (found == NULL)
+				error(10);
 
-					if (found == NULL)
-						/* nicht gefunden --> Fehler: Id nicht deklariert*/
-						error(10);
+      // Id in ST gefunden ; Art prüfen
+			else {
+        kind = found->token;	// Art des ST-Eintrags
 
-					else	// Id in ST gefunden ; Art pr�fen
+				switch(kind) {
+          case KONST:	// Konstantenname --> okay
+						break;
 
-						{kind = found->token;	// Art des ST-Eintrags
+				  case INTIDENT:// einfache Variable, Typ int --> okay
+						break;
 
-						switch(kind)
-						{ case KONST:	// Konstantenname --> okay
+				  case REALIDENT:// einfache Variable, Typ real --> okay
+						break;
 
-										break;
+				  case PROC:	// Name einer Prozedur in
+						// Factor nicht erlaubt
+						error(20); // --> exit
+						// break;
+				} // endswitch (kind)
 
-						  case INTIDENT:// einfache Variable, Typ int --> okay
-
-										break;
-
-						  case REALIDENT:// einfache Variable, Typ real --> okay
-
-										break;
-
-
-
-
-						  case PROC:	// Name einer Prozedur in
-										// Factor nicht erlaubt
-										error(20); // --> exit
-										// break;
-
-						} // endswitch (kind)
-
-					   // n�chstes Symbol lesen
-
-				       lookahead=nextsymbol();
-				     }	// endif
-
-
-					break;
+			  // nächstes Symbol lesen
+        lookahead=nextsymbol();
+	    } // endif
+			break;
 
 		default:	// kein korrekter Faktor
-					error (27);
+			error (27);
 	}	// endswitch (lookahead)
-
 	return (0);
 } 	// end factor
 

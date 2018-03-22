@@ -25,12 +25,9 @@ verwendet werden, die den angegebenen Text ausgibt
 #include "global.h"
 #endif
 
-
 /***************** Fehlertexte **********************/
 
-
-char * errtxt[]=
-{
+string errtxt[] = {
 /*0*/	"Undefined Syntaxerror ",
 /*1*/	"'='erwartet anstelle von ':=' ",
 /*2*/	"Integer-Konstante nach = erwartet ",
@@ -55,56 +52,39 @@ char * errtxt[]=
 /*21*/	" ')' fehlt ",
 /*22*/	" Symbol nach Faktor nicht erlaubt",
 /*23*/	"Ausdruck darf nicht mit diesem Symbol beginnen",
-/*24*/	"Zahl zu gro� ",
-/*25*/	"Programm zu gro�",
+/*24*/	"Zahl zu groß ",
+/*25*/	"Programm zu groß",
 /*26*/	"Prozedurschachtelung zu tief",
 /*27*/	"kein Faktor: Name oder Konstante oder ( E) ",
 /*28*/	" Symboltabelle voll",
 /*29*/	"Lexemfeld voll",
 /*30*/	"Statement erwartet" ,
 /*31*/	"Korrektes Programmende fehlt",
-/*32*/	" unzul�ssiges Eingabezeichen (Scanner)",
+/*32*/	" unzulässiges Eingabezeichen (Scanner)",
 /*33*/   "Nach PROGRAM noch Symbole in Eingabedatei",
 /*34*/	"Identifikator doppelt deklariert",
 /*35*/	"Doppelpunkt erwartet",
-/*36*/	"Unzul�ssiger Typ",
+/*36*/	"Unzulässiger Typ",
 /*37*/  "Falsche Eintragsart in Symboltabelle",
 /*38*/	"Keine korrekte reelle Konstante ",
 /*39 */	" fi fehlt"
 };
 
-
-
-
 /***************** Fehlerfunktion **********************/
 
-
-
-void error( int nr)
 /* Funktion gibt den der Nummer nr entsprechenden Fehlertext aus */
-{
-	ferr<< "Zeile" << lineno << errtxt[nr];
-
+void error( int nr ) {
+	ferr << "Zeile" << lineno << errtxt[nr] << endl;
 	exit(1);
 }
 
-
-
-void errortext ( char * text)
 /* Funktion gibt den angegebenen  Fehlertext aus */
-{
-	ferr<< "Zeile" << lineno << text;
-
+void errortext ( string text) {
+	ferr << "Zeile" << lineno << text << endl;
 	exit(1);
 }
 
-
-
-
-
-void warningtext ( char * text)
 /* Funktion gibt den angegebenen  Warnungstext aus */
-{
-	ferr<< "Zeile" << lineno << text;
-
+void warningtext ( string text ) {
+	ferr << "Zeile" << lineno << text << endl;
 }

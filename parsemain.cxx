@@ -12,15 +12,12 @@
 
 // Mainprogramm f�r Parser
 
-int main()
-{
-
-
+int main(int argc, char** argv) {
 	// Compiler  intialisieren
-	initialize();
+	initialize(argc, argv);
 	// Analyse PROGRAM
 	program();
 	// Analyse korrekt beendet --> ST ausgeben; Abschlussarbeiten
-	stop ();
+	stop();
 	exit(0); 			// Erfolg
 }

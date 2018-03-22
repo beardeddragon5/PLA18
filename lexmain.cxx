@@ -17,32 +17,22 @@
 #include "global.h"
 #endif
 
-
-
-
-
-
-int main()
-{
+int main(int argc, char** argv) {
 	int lookahead = -1;
 
 	/* Initialisierungen der lexikalischen Analyse durchf�hren */
-	initialize();
+	initialize(argc, argv);
 
 	/* 1. Symbol lesen  */
-
 	lookahead = nextsymbol();
 
 	/* Symbol ausgeben */
-	fout << "		Tokentyp=    " <<lookahead;
+	fout << "		Tokentyp=    " << lookahead;
 
  /* Symbole aus Eingabedatei lesen bis Dateiende */
-  while (lookahead != DONE)
-	{
+  while (lookahead != DONE) {
 		lookahead = nextsymbol();
-		fout << "		Tokentyp=    " <<lookahead;
-
+		fout << "		Tokentyp=    " << lookahead;
  	}
-
 	exit(0); 	/* Erfolg */
 }
