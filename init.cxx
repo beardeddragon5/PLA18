@@ -132,8 +132,14 @@ void newInitalize( int argc, char** argv ) {
 		exit(1);
 	}
 
-	fin.open(inputfile, ios::in);
-	fin.open(outputfile, ios::out);
+	fin.open(inputfile, ifstream::in);
+
+	if ( fin.fail() ) {
+		ferr << "opening file: " << inputfile << " failed" << endl;
+		exit(1);
+	}
+
+	fout.rdbuf(openWriteFile( outputfile ));
 
 	initlexan();
 }
