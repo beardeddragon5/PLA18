@@ -3,3 +3,4 @@
 lexmain
 parsemain
 *.out
+*.vscode

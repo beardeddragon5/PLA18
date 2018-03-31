@@ -9,6 +9,9 @@
 #define NORW   14   		/* Zahl der reservierten Worte */
 #define RWSYMLEN  15		/* Max. Länge reservierter Symbole */
 
+#include <climits>
+#include <cmath>
+
 
 int lineno;					/* Zeilennummer */
 
@@ -65,7 +68,7 @@ struct ressw restable [] = {
    falls gefunden,
    sonst 0
 */
-int lookforres( char *s) {
+int lookforres( char *s ) {
   struct ressw *ptr;
   for ( ptr = restable; ptr < &restable[NORW]; ptr++ ) {
     if (strcmp(ptr->ressymbol, s) == 0) {
@@ -113,43 +116,84 @@ int nextsymbol() {
 	while( !fin.eof() ) {			/* Eingabe-Dateiende nicht erreicht */
     /* Blank und Tab in Ausgabedatei kopieren und überlesen */
 		if ( actchar== ' ' || actchar == '\t' ) {
-      fout.put(actchar);
+      		fout.put(actchar);
 			fin.get(actchar);
 
-    /* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
-    } else if (actchar== '\n'  ||  actchar == '\r') {
-      fout.put(actchar);
-		  fin.get(actchar);
-		  lineno++;
+		/* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
+		} else if (actchar== '\n'  ||  actchar == '\r') {
+			fout.put(actchar);
+			fin.get(actchar);
+			lineno++;
 
-    /***** actchar ist Ziffer --> Konstanten erkennen  *****/
+		/***** actchar ist Ziffer --> Konstanten erkennen  *****/
 		} else if ( isdigit(actchar) ) {
 			char zahl [BSIZE];	 /* Puffer für Ziffern */
 			int b = 0;				   /* Zeichenzahl*/
 
-      // TODO
+			fout.put( actchar );
+			zahl[b++] = actchar;
+			fin.get( actchar );
+			fout.put( actchar );
+			while ( isdigit( actchar ) || actchar == '.' ) {
+				zahl[b++] = actchar;
+				fin.get( actchar );
+				fout.put( actchar );
+			}
+			if ( ! isspace( actchar ) ) {
+				error(22);
+			}
+			zahl[b] = '\0';
+			
+			bool isReal = false;
+			for ( int i = 0; i < b; i++ ) {
+				if ( zahl[i] == '.' ) {
+					isReal = true;
+					break;
+				}
+			}
 
-    /***** actchar ist Buchstabe -->  Identifikatoren erkennen ****/
-    } else if ( isalpha(actchar) ) {
-      int b = 0 ;				/* Zeichenzahl */
+			if ( isReal ) {
+				double real = strtod( zahl, nullptr );
+				if ( errno == ERANGE && real == HUGE_VAL ) {
+					error(24); // To big number
+				}
+				
+				return REALNUM;
+			}
+			long val = strtol( zahl, nullptr, 0 );
+			if ( errno == ERANGE && ( val == LONG_MIN || val == LONG_MAX ) ) {
+				error(24); // To big number
+			}	
+			if ( val > INT32_MAX || val < INT32_MIN ) {
+				error(24); // To big number
+			}
+
+			return INTNUM;
+		/***** actchar ist Buchstabe -->  Identifikatoren erkennen ****/
+		} else if ( isalpha(actchar) ) {
+			int b = 0 ;				/* Zeichenzahl */
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
-					    solange Buchstaben oder Ziffern folgen --> Identifikator */
+					solange Buchstaben oder Ziffern folgen --> Identifikator */
 
-      // TODO
+			// TODO
+			fout.put(actchar); // prevent from
+			fin.get(actchar); // infinity loop
 
-      /***** Sonderzeichen oder Operatoren erkennen ***************/
+		/***** Sonderzeichen oder Operatoren erkennen ***************/
 		} else {
-      fout.put(actchar);				/* Zeichen in Ausgabedatei */
-	    switch(actchar) {
-        case '=':
-          fin.get(actchar);
+			fout.put(actchar);				/* Zeichen in Ausgabedatei */
+			switch(actchar) {
+				case '=':
+					fin.get(actchar);
 					return(EQ);
 
-        // TODO
-
-        default: 	error(32);
+				// TODO
+				
+				default:
+					error(32);
+					break;
 			} /* end-switch */
 		} /* end-else */
- 	}/* end while */
+	}/* end while */
  	return(DONE); 	/* EIngabe -Ende erreicht */
 }
