@@ -3,14 +3,17 @@
 
 /*******   **************/
 
-#ifndef GLOBAL_H
-#include "global.h"
+#ifndef PARSER_H
+#include "parser.h"
 #endif
 
-int lookahead;					/* lookahead enthält nächsten Eingabetoken */
+#ifndef ERROR_H
+#include "error.h"
+#endif
 
-int exp();
-int nextsymbol();
+// int lookahead;					/* lookahead enthält nächsten Eingabetoken */
+
+int exp( parser_t& parser );
 
 
 /******************  factor  **********************************************/
@@ -20,33 +23,33 @@ Schnittstelle:
 	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 */
-int factor() {
-  int kind;
-  st_entry *found;		// Zeiger auf Eintrag in ST
+int factor( parser_t& parser ) {
+	TRACE( parser, "Faktor" );
+
+  	int kind;
+  	st_entry *found;		// Zeiger auf Eintrag in ST
 	int factor_typ;
 
-	if (tracesw)
-	 trace << "\n Zeile:" << lineno << "	Faktor";
-
-  // je nach nächstem Eingabesymbol in lookahead
-	switch(lookahead) {
+	// je nach nächstem Eingabesymbol in lookahead
+	switch( parser.lookahead.type ) {
 		case KLAUF:	/* Symbol '(' folgt --> (EXPRESSION) erwartet*/
-			lookahead=nextsymbol();
-			exp();
-			if(lookahead== KLZU)
+			parser.next();
+
+			exp( parser );
+			if ( parser.lookahead == KLZU )
 				// korrekt ; nächstes Symbol lesen --> Ende
-				lookahead = nextsymbol();
+				parser.next();
 			else
-				error(27); // kein Faktor
+				error( parser.lexan, 27); // kein Faktor
 			break;
 
 		case INTNUM:
  			/* Int-Zahl (INTNUMBER) gefunden --> okay */
-			lookahead=nextsymbol();
+			parser.next();
 			break;
 
 		case REALNUM: 		/* Real-Zahl (REALNUMBER) gefunden --> okay */
-			lookahead=nextsymbol();
+			parser.next();
 			break;
 
 		case ID:	/* Identifikator (ID) gefunden  */
@@ -55,39 +58,30 @@ int factor() {
 				Deklaration muss vorhanden sein
 				und also Eintrag in ST */
 
-			found = lookup(idname);
+			found = lookup( parser.lookahead.idname );
 
-      /* nicht gefunden --> Fehler: Id nicht deklariert*/
-			if (found == NULL)
-				error(10);
+      		/* nicht gefunden --> Fehler: Id nicht deklariert*/
+			if (found == NULL) {
+				error( parser.lexan, 10);
+			}
+			// Id in ST gefunden ; Art prüfen
+			kind = found->token;	// Art des ST-Eintrags
 
-      // Id in ST gefunden ; Art prüfen
-			else {
-        kind = found->token;	// Art des ST-Eintrags
-
-				switch(kind) {
-          case KONST:	// Konstantenname --> okay
-						break;
-
-				  case INTIDENT:// einfache Variable, Typ int --> okay
-						break;
-
-				  case REALIDENT:// einfache Variable, Typ real --> okay
-						break;
-
-				  case PROC:	// Name einer Prozedur in
-						// Factor nicht erlaubt
-						error(20); // --> exit
-						// break;
-				} // endswitch (kind)
-
-			  // nächstes Symbol lesen
-        lookahead=nextsymbol();
-	    } // endif
+			switch(kind) {
+				case KONST:	// Konstantenname --> okay
+				case INTIDENT:// einfache Variable, Typ int --> okay
+				case REALIDENT:// einfache Variable, Typ real --> okay
+					break;
+				case PROC:	// Name einer Prozedur in
+					// Factor nicht erlaubt
+					error( parser.lexan, 20); // --> exit
+			}
+			// nächstes Symbol lesen
+			parser.next();
 			break;
 
 		default:	// kein korrekter Faktor
-			error (27);
+			error( parser.lexan, 27);
 	}	// endswitch (lookahead)
 	return (0);
 } 	// end factor
@@ -104,19 +98,18 @@ Schnittstelle:
 							Typ des Terms ist Funktionswert
 
 */
-int term() {
-  int ret;
+int term( parser_t& parser ) {
+	TRACE( parser, "Term" );
+  	int ret;
 
-	if (tracesw)
-    trace << "\n Zeile:" << lineno << "Term:";
-	ret = factor();
+	ret = factor( parser );
 	// korrekter Factor
 
-	while(lookahead == MULT || lookahead == DIV) {
-	  // solange * oder / folgt, muss Factor kommen
-    // nächstes Symbol lesen
-	  lookahead=nextsymbol();
-		ret = factor();
+	while( parser.lookahead == MULT || parser.lookahead == DIV ) {
+	  	// solange * oder / folgt, muss Factor kommen
+    	// nächstes Symbol lesen
+	  	parser.next();
+		ret = factor( parser );
 	}
 	return(0);
  }
@@ -131,20 +124,19 @@ Schnittstelle:
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 							Funktionswert ist Typ des Ausdrucks
 */
-int exp() {
+int exp( parser_t& parser ) {
+	TRACE( parser, "Ausdruck" );
 	int typ_left,typ_right;
-	if (tracesw)
-	    trace<<"\n Zeile:"<< lineno<<"Ausdruck";
 
-	typ_left = term();
+	typ_left = term( parser );
 	// korrekter Term
 
-	while (lookahead == PLUS || lookahead == MINUS ) {
+	while (parser.lookahead == PLUS || parser.lookahead == MINUS ) {
 		// solange + oder - folgt, muss Term kommen
-    // nächstes Symbol lesen
-		lookahead=nextsymbol();
+    	// nächstes Symbol lesen
+		parser.next();
 		// Term prüfen
-		typ_right = term();
+		typ_right = term( parser );
 		// nach korrektem Ende wurde nächstes Symbol gelesen
 	}
 	return (0);
@@ -159,32 +151,30 @@ Schnittstelle:
 	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 */
-int condition() {
-  int typ_left, typ_right;
+int condition( parser_t& parser ) {
+	TRACE( parser, "Condition");
+  	int typ_left, typ_right;
 
-	if (tracesw)
-	    trace<<"\n Zeile:"<< lineno<<"Condition";
-
-	typ_left = exp();
+	typ_left = exp( parser );
 	// korrekter Ausdruck
 	// relationaler Operator muss folgen
-	switch(lookahead) {
+	switch(parser.lookahead.type) {
 		case EQ:
 		case NE:
 		case LT:
 		case LE:
 		case GT:
 		case GE:// nächstes Symbol lesen
-				lookahead=nextsymbol();
-				// Ausdruck muss folgen
-				typ_right = exp();
-				break;
+			parser.next();
+			// Ausdruck muss folgen
+			typ_right = exp( parser );
+			break;
 
 		default: // kein relationaler Operator
-				 error(19);
+			error( parser.lexan, 19);
 	}
 	if (typ_left != typ_right)
-		errortext("Typen der Operanden nicht kompatibel");
+		errortext( parser.lexan, "Typen der Operanden nicht kompatibel");
 
 	return(typ_left);
 }
@@ -205,16 +195,14 @@ Schnittstelle:
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-void statement() {
-  st_entry *found;		// Zeiger auf ST-Eintrag
-  int typ_left, typ_right;
+void statement( parser_t& parser ) {
+	TRACE( parser, "Statement");
+	st_entry *found;		// Zeiger auf ST-Eintrag
+	int typ_left, typ_right;
 
-  if (tracesw)
-      trace<<"\n Zeile:"<< lineno<<"Statement";
-
-  // überprüfung des aktuellen lex. Symbols
-  // TODO
-  return;	// end statement
+	// überprüfung des aktuellen lex. Symbols
+	// TODO
+	return;	// end statement
 }
 
 
@@ -233,16 +221,14 @@ Schnittstelle:
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-void procdecl() {
-  st_entry* neu, *found;          // Zeiger auf ST-Eintrag
+void procdecl( parser_t& parser ) {
+	TRACE( parser, "Procdeklaration");
+	st_entry* neu, *found;          // Zeiger auf ST-Eintrag
 
-  symtable* neusym;		// Zeiger auf Symboltabelle
+	symtable* neusym;		// Zeiger auf Symboltabelle
 
-  if (tracesw)
-	  trace<<"\n Zeile:"<< lineno<<"Procdeklaration:";
-
-  // TODO
-  return;   // end procdecl
+	// TODO
+	return;   // end procdecl
 }
 
 
@@ -259,15 +245,13 @@ Schnittstelle:
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-void vardecl() {
-  st_entry* neu, *found;
-
-  if (tracesw)
-	    trace << "\n Zeile:" << lineno << "Variablendeklaration:";
-
+void vardecl( parser_t& parser ) {
+	TRACE( parser, "Variablendeklaration");
+  	st_entry* neu, *found;
+	
 	// nach var muss Identifikator folgen
-  // TODO
-  return;
+	// TODO
+  	return;
 }
 
 /****************** constdecl ***************************************************/
@@ -284,15 +268,12 @@ Schnittstelle:
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-void constdecl() {
-  st_entry *neu, *found;
-
-	if (tracesw)
-	    trace<<"\n Zeile:"<< lineno<<"Konstantendeklaration:";
-
+void constdecl( parser_t& parser ) {
+  	TRACE( parser, "Konstantendeklaration");
+	st_entry *neu, *found;
 	// auf const muss IDENT folgen
-  // TODO
-  return;		// end constdecl
+  	// TODO
+  	return;		// end constdecl
 }
 
 
@@ -327,22 +308,18 @@ Schnittstelle:
 
 */
 /* symtable * neusym :	Zeiger auf neue ST */
-void block(symtable * neusym) {
-  if (tracesw)
-	  trace<<"\n Zeile:"<< lineno<<"Block";
+void block( parser_t& parser, symtable * neusym) {
+	TRACE( parser, "Block");
 
 	// actsym auf neue Symboltabelle setzen
 
-  // TODO
+  	// TODO
 
 	// bei Blockende : Symboltabelle zurücksetzen
 	// actsym = Zeiger auf vorherige Symboltabelle
-  // TODO
-  return;
+  	// TODO
+  	return;
 }
-
-
-
 
 
 /****************** program    ***************************************************/
@@ -355,28 +332,24 @@ Schnittstelle:
 	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
 
 */
-void program() {
-  if (tracesw)
-	  trace <<"\n Zeile:"<< lineno<<"Programm";
+void program( parser_t& parser ) {
+	TRACE( parser, "Programm" );
 
 	// globale Symboltabelle  anlegen (firstsym
 	firstsym = create_newsym();
 
-	// erstes Symbol lesen
-	lookahead=nextsymbol();
-
 	// Block muss folgen
-	block (firstsym);
+	block( parser, firstsym );
 
 	//  nach Block muss '$' folgen
-	if (lookahead == PROGEND)
+	if (parser.lookahead == PROGEND)
 		// nächstes Symbol lesen
-		lookahead=nextsymbol();
+		parser.next();
 	else
-		 // korrektes Programmende fehlt
-		 error(31);
+		// korrektes Programmende fehlt
+		error( parser.lexan, 31 );
 
 	// Dateiende erreicht ?
-	if (lookahead != DONE)
-		error (33); // noch Symbole in Eingabedatei nach RPOGRAM
-}	// end program
+	if (parser.lookahead != DONE)
+		error( parser.lexan, 33 ); // noch Symbole in Eingabedatei nach RPOGRAM
+}

@@ -9,8 +9,12 @@ Symboltabelle und Ausgabe der Symboltabelle */
 sondern in das Feld lexemes eingetragen; im Symboltabelleneintrag
 wird ein Zeiger auf den Eintrag in lexemes abgelegt */
 
-#ifndef GLOBAL_H
-#include "global.h"
+#ifndef SYMBOL_H
+#include "symbol.h"
+#endif
+
+#ifndef ERROR_H
+#include "error.h"
 #endif
 
 
@@ -48,7 +52,7 @@ Wird der Bezeichner gefunden, wird ein Zeiger auf den zugehörigen
 Symbolotabelleneintrag zurückgeliefert; wird der Name nicht gefunden NULL */
 
 /* Sucht Name s in der aktuellen und Übergeordneten ST */
-st_entry* lookup( char *s ) {
+st_entry* lookup( string s ) {
   int i;
 	symtable* sptr;				/* ST-Zeiger */
 
@@ -58,7 +62,7 @@ st_entry* lookup( char *s ) {
 
 	while (sptr != NULL) {
     for ( i =0; i<sptr->anzahl; i++) {
-			if (strcmp (sptr->eintrag[i].name, s) == 0) {
+			if (strcmp (sptr->eintrag[i].name, s.c_str()) == 0) {
         /* Name gefunden --> Zeiger auf ST-Eintrag zurückliefern */
 			  return(&sptr->eintrag[i]);
       }
@@ -76,11 +80,11 @@ Wird der Bezeichner gefunden, wird ein Zeiger auf den zugehörigen
 Symboltabelleneintrag zurückgeliefert (== Fehlerfall); wird der Name nicht gefunden NULL */
 
 /* Sucht Name s in der aktuellen ST */
-st_entry* lookup_in_actsym (char *s) {
+st_entry* lookup_in_actsym (string s) {
   int i;
 	/* Durchsuche Einträge in actsym */
 	for ( i =0; i < actsym->anzahl; i++) {
-    if (strcmp (actsym->eintrag[i].name, s) == 0) {
+    if (strcmp (actsym->eintrag[i].name, s.c_str()) == 0) {
       /* Name gefunden --> Zeiger auf ST-Eintrag zurückliefern */
       return(&actsym->eintrag[i]);
     }
@@ -108,17 +112,19 @@ Ein Zeiger auf den einzutragenden Namen befindet sich in idname
 Rückgabe ist ein Zeiger auf den neuen ST-EIntrag
 *************/
 //st_entry * insert(int tok, char * name, int wert)
-st_entry* insert(int tok) {
+st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
 	int len;
 	st_entry neu;					/* Neuer ST-Eintrag  */
 	st_entry* lastentry;			/* Zeiger auf ST-EIntrag */
 
-	len = strlen(idname); 			/* Länge des Namens bestimmen */
+	const char* idname = name.c_str();
+
+	len = strlen( idname ); 			/* Länge des Namens bestimmen */
 
 	if (actsym->anzahl >= SYMMAX)	/* MAximale Grösse Überschritten ? */
-		error(28);
+		error( lexan, 28 );
 	if (lastchar +len+1 >= STRMAX)	/* Länge des Stringpuffers Überschritten ?*/
-		error(29);
+		error( lexan, 29 );
 
 	strcpy(lexemes+lastchar+1,idname);  /* Name in Feld lexemes ablegen */
 
@@ -132,17 +138,17 @@ st_entry* insert(int tok) {
   /* Art eintragen abhängig von tok */
 	switch(tok) {
     case KONST : /* Bei Konstante: Wert eintragen */
-			neu.wertaddr = num;
+			neu.wertaddr = wertaddr;
 			break;
 
 		case INTIDENT:   /* Bei Identifikator vom Typ int */
 			neu.wertaddr = 0;
-	    trace << "\n Zeile:" << lineno << " in insert INTIDENT";
+			TRACE( lexan, "insert INTIDENT" );
 			break;
 
 		case REALIDENT:   /* Bei Identifikator vom Typ real  */
 			neu.wertaddr = 0;
-	    trace << "\n Zeile:" << lineno << " in insert REALIDENT";
+			TRACE( lexan, "insert REALIDENT" );
 			break;
 
 		case PROC: /* bei Prozedur: ST für lokale Deklarationen der neuen Prozedur
@@ -151,7 +157,7 @@ st_entry* insert(int tok) {
 	 		break;
 
 		default:	/* falsche Eintragsart */
-			errortext( "falsche Eintragsrt in Symboltabelle\n" );
+			errortext( lexan, "falsche Eintragsrt in Symboltabelle\n" );
 			break;
   }
 	actsym->eintrag[actsym->anzahl] = neu; /* Neuen Eintrag in ST eintragen */

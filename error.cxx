@@ -21,8 +21,8 @@ verwendet werden, die den angegebenen Text ausgibt
 
 *****************************************************/
 
-#ifndef GLOBAL_H
-#include "global.h"
+#ifndef LEXAN_H
+#include "lexan.h"
 #endif
 
 /***************** Fehlertexte **********************/
@@ -73,18 +73,18 @@ string errtxt[] = {
 /***************** Fehlerfunktion **********************/
 
 /* Funktion gibt den der Nummer nr entsprechenden Fehlertext aus */
-void error( int nr ) {
-	ferr << "Zeile" << lineno << errtxt[nr] << endl;
+void error( lexan_t& lexan, int nr ) {
+	ferr << "Zeile" << lexan.lineno << errtxt[nr] << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Fehlertext aus */
-void errortext( string text) {
-	ferr << "Zeile" << lineno << text << endl;
+void errortext( lexan_t& lexan, string text) {
+	ferr << "Zeile" << lexan.lineno << text << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Warnungstext aus */
-void warningtext( string text ) {
-	ferr << "Zeile" << lineno << text << endl;
+void warningtext( lexan_t& lexan, string text ) {
+	ferr << "Zeile" << lexan.lineno << text << endl;
 }

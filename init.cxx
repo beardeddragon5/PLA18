@@ -10,8 +10,12 @@
 */
 
 
-#ifndef GLOBAL_H
-#include "global.h"
+#ifndef INIT_H
+#include "init.h"
+#endif
+
+#ifndef SYMBOL_H
+#include "symbol.h"
 #endif
 
 ifstream fin;					/* Zu Übersetzende Eingaben */
@@ -89,10 +93,10 @@ std::streambuf* openWriteFile( string file ) {
 /**
  * Initialize program with switches
  */
-void newInitalize( int argc, char** argv ) {
+lexan_t* newInitalize( int argc, char** argv ) {
 	if ( argc < 3 ) {
 		help( argv[0] );
-		return;
+		return nullptr;
 	}
 	int usedArgs = 1;
 
@@ -121,7 +125,7 @@ void newInitalize( int argc, char** argv ) {
 
 	if ( (argc - usedArgs) < 2 ) {
 		help( argv[0] );
-		return;
+		return nullptr;
 	}
 
 	char* inputfile = argv[argc - 2];
@@ -141,66 +145,65 @@ void newInitalize( int argc, char** argv ) {
 
 	fout.rdbuf(openWriteFile( outputfile ));
 
-	initlexan();
+	return initlexan();
 }
 
-void initialize( int argc, char** argv ) {
+lexan_t* initialize( int argc, char** argv ) {
 	if ( argc == 1 ) {
 		help( argv[0] );
-		return;
+		return nullptr;
 	}
 
 	if ( indexOfArg( argc, argv, "-h", "--help" ) != -1 ) {
 		help( argv[0] );
-		return;
+		return nullptr;
 	}
 
 	if ( indexOfArg( argc, argv, "-O", "--old" ) == -1 ) {
-		newInitalize( argc, argv );
-		return;
+		return newInitalize( argc, argv );
 	}
 
-  char c;
-  char filename[20];
+	char c;
+	char filename[20];
 
-  cout << "\n Name der Eingabedatei eingeben-->";
-  cin >> filename;
+	cout << "\n Name der Eingabedatei eingeben-->";
+	cin >> filename;
 
-  /* Eingabefile öffnen*/
+  	/* Eingabefile öffnen*/
 	fin.open(filename, ios::in);
 
  	cout << "\n Name der Ausgabedatei eingeben-->";
  	cin >> filename;
 
-  /* Ausgabedatei öffnen */
+  	/* Ausgabedatei öffnen */
 	fout.rdbuf(openWriteFile( filename ));
 
-  fout << "\n\n***************** Ausgabe ***************\n";
+  	fout << "\n\n***************** Ausgabe ***************\n";
 
  	cout << "\n Name der Fehlerdatei eingeben-->";
  	cin >> filename;
 
-  /* Fehlerdatei öffnen */
+  	/* Fehlerdatei öffnen */
 	ferr.rdbuf(openWriteFile( filename ));
 
-  ferr<<"\n\n**************** Fehlermeldungen*************\n";
+  	ferr<<"\n\n**************** Fehlermeldungen*************\n";
 
-  cout << "\n Trace gewünscht ? (y/n): ";
-  cin >> c;
-  if ( c == 'y') {
+  	cout << "\n Trace gewünscht ? (y/n): ";
+  	cin >> c;
+  	if ( c == 'y') {
 		/* Datei für Trace  öffnen */
 		trace.rdbuf(openWriteFile( "trace.out" ));
-    tracesw = TRUE;
-  } else {
+    	tracesw = TRUE;
+  	} else {
 		tracesw = FALSE;
 	}
 
 	/* Datei für Symboltabellenausgabe öffnen */
 	fsym.rdbuf(openWriteFile( "symtable.out" ));
-  fsym<<"\n\n**************** Symboltabellen*************\n";
+  	fsym<<"\n\n**************** Symboltabellen*************\n";
 
  	/* Initialisieren des Scanners */
-  initlexan();
+  	return initlexan();
  }
 
 /************ Endebehandlung bei fehlerfreier Übersetzung  *****/
@@ -209,5 +212,5 @@ void initialize( int argc, char** argv ) {
 
 /* Symboltabellen ausgeben  */
 void stop() {
-  printsymtab(firstsym);
+  	printsymtab(firstsym);
 }

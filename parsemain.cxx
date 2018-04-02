@@ -3,10 +3,12 @@
 			Stand Sommersemester 2018
 *************************************************/
 
+#ifndef INIT_H
+#include "init.h"
+#endif
 
-
-#ifndef GLOBAL_H
-#include "global.h"
+#ifndef PARSER_H
+#include "parser.h"
 #endif
 
 
@@ -14,9 +16,11 @@
 
 int main(int argc, char** argv) {
 	// Compiler  intialisieren
-	initialize(argc, argv);
+	lexan_t* lexan = initialize(argc, argv);
+	parser_t parser( *lexan );
+
 	// Analyse PROGRAM
-	program();
+	program( parser );
 	// Analyse korrekt beendet --> ST ausgeben; Abschlussarbeiten
 	stop();
 	exit(0); 			// Erfolg

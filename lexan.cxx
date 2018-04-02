@@ -6,6 +6,14 @@
 #include "global.h"
 #endif
 
+#ifndef ERROR_H
+#include "error.h"
+#endif
+
+#ifndef LEXAN_H
+#include "lexan.h"
+#endif
+
 #define NORW   14   		/* Zahl der reservierten Worte */
 #define RWSYMLEN  15		/* Max. Länge reservierter Symbole */
 
@@ -13,15 +21,15 @@
 #include <cmath>
 
 
-int lineno;					/* Zeilennummer */
+// int lineno;					/* Zeilennummer */
 
-int num ;           /* Wert einer int-Konstanten  */
-double realnum; 		/* Wert einer real-Konstanten*/
+// int num ;           /* Wert einer int-Konstanten  */
+// double realnum; 		/* Wert einer real-Konstanten*/
 
-char idname[BSIZE];      /* Name eines Bezeichners ; wird vom Parser weiterverwendet */
+// char idname[BSIZE];      /* Name eines Bezeichners ; wird vom Parser weiterverwendet */
 
 
-char actchar;       /* gelesenes Zeichen */
+// char actchar;       /* gelesenes Zeichen */
 
 
 /*  Um Bezeichner von reservierten Symbolene unterscheiden zu können,
@@ -69,12 +77,12 @@ struct ressw restable [] = {
    sonst 0
 */
 int lookforres( char *s ) {
-  struct ressw *ptr;
-  for ( ptr = restable; ptr < &restable[NORW]; ptr++ ) {
-    if (strcmp(ptr->ressymbol, s) == 0) {
+	struct ressw *ptr;
+	for ( ptr = restable; ptr < &restable[NORW]; ptr++ ) {
+		if (strcmp(ptr->ressymbol, s) == 0) {
 			return (ptr->token); /* Symbol gefunden */
-    }
-  }
+		}
+	}
 	return(0); /* Symbol nicht gefunden */
 }
 
@@ -83,12 +91,11 @@ int lookforres( char *s ) {
 /* wird aufgerufen von  initialize () aus init.cxx ;
 nimmt Vorbesetzungen der Variablen num, realnum,  idname und lineno vor;
 liest das erste Zeichen aus der Eingabe */
-void initlexan() {
-  num = NONE;
-  realnum = 0.0;
-  idname [0] = '\0';
-  lineno = 1;
-  fin.get(actchar);			/* Erstes Zeichen der Eingabe lesen */
+lexan_t* initlexan() {
+	lexan_t* lex = (lexan_t*) malloc( sizeof(lexan_t) );
+	lex->lineno = 1;
+	fin.get( lex->actchar );
+	return lex;
 }
 
 /*
@@ -110,37 +117,34 @@ liefert Codierung des nächsten Symbols (token):
 	 - Schlüsselwort:			 token == Tokentyp des reservierten Symbols nach Suche in restable
 	 - Operatoren,Sonderzeichen :entsprechende Token
 **/
-int nextsymbol() {
+symbol_t nextsymbol(lexan_t& lex) {
 	int token;
 	char lexbuf[BSIZE];		/* lokaler Puffer für Eingabezeichen */
 	while( !fin.eof() ) {			/* Eingabe-Dateiende nicht erreicht */
     /* Blank und Tab in Ausgabedatei kopieren und überlesen */
-		if ( actchar== ' ' || actchar == '\t' ) {
-      		fout.put(actchar);
-			fin.get(actchar);
+		if ( lex.actchar == ' ' || lex.actchar == '\t' ) {
+      		fout.put(lex.actchar);
+			fin.get(lex.actchar);
 
 		/* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
-		} else if (actchar== '\n'  ||  actchar == '\r') {
-			fout.put(actchar);
-			fin.get(actchar);
-			lineno++;
+		} else if ( lex.actchar == '\n' || lex.actchar == '\r' ) {
+			fout.put(lex.actchar);
+			fin.get(lex.actchar);
+			lex.lineno++;
 
 		/***** actchar ist Ziffer --> Konstanten erkennen  *****/
-		} else if ( isdigit(actchar) ) {
+		} else if ( isdigit(lex.actchar) ) {
 			char zahl [BSIZE];	 /* Puffer für Ziffern */
 			int b = 0;				   /* Zeichenzahl*/
 
-			fout.put( actchar );
-			zahl[b++] = actchar;
-			fin.get( actchar );
-			fout.put( actchar );
-			while ( isdigit( actchar ) || actchar == '.' ) {
-				zahl[b++] = actchar;
-				fin.get( actchar );
-				fout.put( actchar );
-			}
-			if ( ! isspace( actchar ) ) {
-				error(22);
+			fout.put( lex.actchar );
+			zahl[b++] = lex.actchar;
+			fin.get( lex.actchar );
+			fout.put( lex.actchar );
+			while ( isdigit( lex.actchar ) || lex.actchar == '.' ) {
+				zahl[b++] = lex.actchar;
+				fin.get( lex.actchar );
+				fout.put( lex.actchar );
 			}
 			zahl[b] = '\0';
 			
@@ -155,45 +159,105 @@ int nextsymbol() {
 			if ( isReal ) {
 				double real = strtod( zahl, nullptr );
 				if ( errno == ERANGE && real == HUGE_VAL ) {
-					error(24); // To big number
-				}
-				
-				return REALNUM;
+					error(lex, 24); // To big number
+				}  
+				return real;
 			}
 			long val = strtol( zahl, nullptr, 0 );
 			if ( errno == ERANGE && ( val == LONG_MIN || val == LONG_MAX ) ) {
-				error(24); // To big number
+				error(lex, 24); // To big number
 			}	
 			if ( val > INT32_MAX || val < INT32_MIN ) {
-				error(24); // To big number
+				error(lex, 24); // To big number
 			}
-
-			return INTNUM;
+			return (int) val;
 		/***** actchar ist Buchstabe -->  Identifikatoren erkennen ****/
-		} else if ( isalpha(actchar) ) {
+		} else if ( isalpha(lex.actchar) ) {
 			int b = 0 ;				/* Zeichenzahl */
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					solange Buchstaben oder Ziffern folgen --> Identifikator */
 
 			// TODO
-			fout.put(actchar); // prevent from
-			fin.get(actchar); // infinity loop
+			fout.put(lex.actchar); // prevent from
+			fin.get(lex.actchar); // infinity loop
 
 		/***** Sonderzeichen oder Operatoren erkennen ***************/
 		} else {
-			fout.put(actchar);				/* Zeichen in Ausgabedatei */
-			switch(actchar) {
+			fout.put(lex.actchar);				/* Zeichen in Ausgabedatei */
+			switch( lex.actchar) {
 				case '=':
-					fin.get(actchar);
-					return(EQ);
+					fin.get(lex.actchar);
+					return EQ;
 
 				// TODO
 				
 				default:
-					error(32);
+					error(lex, 32);
 					break;
 			} /* end-switch */
 		} /* end-else */
 	}/* end while */
- 	return(DONE); 	/* EIngabe -Ende erreicht */
+ 	return DONE; 	/* EIngabe -Ende erreicht */
+}
+
+string tokentype_toString( tokentype_t type ) {
+	switch( type ) {
+		default:
+		case INVALID: return "INVALID"; 
+		case INTNUM: return "INTNUM";
+		case REALNUM: return "REALNUM";
+		case ID: return "ID";
+		case CONST: return "CONST";
+		case VAR: return "VAR";
+		case PROCEDURE: return "PROCEDURE";
+		case CALL: return "CALL";
+		case BEGIN: return "BEGIN";
+		case END: return "END";
+		case IF: return "IF";
+		case THEN: return "THEN";
+		case ELSE: return "ELSE";
+		case WHILE: return "WHILE";
+		case DO: return "DO";
+		case EQ: return "EQ";
+		case NE: return "NE";
+		case LT: return "LT";
+		case LE: return "LE";
+		case GT: return "GT";
+		case GE: return "GE";
+		case ASS: return "ASS";
+		case KOMMA: return "KOMMA";
+		case SEMICOLON: return "SEMICOLON";
+		case PLUS: return "PLUS";
+		case MINUS: return "MINUS";
+		case MULT: return "MULT";
+		case DIV: return "DIV";
+		case KLAUF: return "KLAUF";
+		case KLZU: return "KLZU";
+		case PROGEND: return "PROGEND";
+		case COLON: return "COLON";
+		case INT: return "INT";
+		case REAL: return "REAL";
+		case FI: return "FI";
+		case DONE: return "DONE";
+	}
+}
+
+std::ostream& operator<<( std::ostream& os, const symbol_t& symbol ) {
+	os << "symbol(" << tokentype_toString(symbol.type);
+
+	switch ( symbol.type ) {
+		case INTNUM:
+			os << ", num = " << symbol.num << ")";
+			break;
+		case REALNUM:
+			os << ", real = " << symbol.realnum << ")";
+			break;
+		case ID:
+			os << ", name = " << symbol.idname << ")";
+			break;
+		default:
+			os << ")";
+			break;
+	}
+	return os;
 }

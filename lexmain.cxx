@@ -13,25 +13,26 @@
 ************************************************/
 
 
-#ifndef GLOBAL_H
-#include "global.h"
+#ifndef INIT_H
+#include "init.h"
 #endif
 
 int main(int argc, char** argv) {
-	int lookahead = -1;
+	symbol_t lookahead( INVALID );
 
 	/* Initialisierungen der lexikalischen Analyse durchführen */
-	initialize(argc, argv);
+	lexan_t* lex = initialize(argc, argv);
+	lexan_t& lexan = *lex;
 
 	/* 1. Symbol lesen  */
-	lookahead = nextsymbol();
+	lookahead = nextsymbol( lexan );
 
 	/* Symbol ausgeben */
 	fout << "		Tokentyp=    " << lookahead;
 
- /* Symbole aus Eingabedatei lesen bis Dateiende */
-  while (lookahead != DONE) {
-		lookahead = nextsymbol();
+	 /* Symbole aus Eingabedatei lesen bis Dateiende */
+  	while (lookahead != DONE) {
+		lookahead = nextsymbol( lexan );
 		fout << "		Tokentyp=    " << lookahead;
  	}
 	exit(0); 	/* Erfolg */
