@@ -186,11 +186,87 @@ symbol_t nextsymbol(lexan_t& lex) {
 			fout.put(lex.actchar);				/* Zeichen in Ausgabedatei */
 			switch( lex.actchar) {
 				case '=':
-					fin.get(lex.actchar);
+					fin.get(lex.actchar);;
 					return EQ;
 
-				// TODO
+				case '<':
+					fin.get(lex.actchar);
+					switch ( lex.actchar ) {
+						case '=':
+							fout.put(lex.actchar);
+							fin.get( lex.actchar );
+							return LE;
+						default:
+							return LT;
+					}
+
+				case '!':
+					fin.get( lex.actchar );
+					fout.put( lex.actchar );
+					if ( lex.actchar != '=' ) {
+						error( lex, 32 );
+					}
+					fin.get( lex.actchar );
+					return NE;
+
+				case '>':
+					fin.get( lex.actchar );
+
+					switch ( lex.actchar ) {
+						case '=':
+							fin.get( lex.actchar );
+							return GE;
+						default:
+							return GT;
+					}
+
+				case ':':
+					fin.get( lex.actchar );
+					switch ( lex.actchar ) {
+						case '=':
+							fout.put( lex.actchar );
+							fin.get( lex.actchar );
+							return ASS;
+						default:
+							return COLON;
+					}
+
+				case ',':
+					fin.get( lex.actchar );
+					return KOMMA;
 				
+				case ';':
+					fin.get( lex.actchar );
+					return SEMICOLON;
+
+				case '+':
+					fin.get( lex.actchar );
+					return PLUS;
+
+				case '-':
+					fin.get( lex.actchar );
+					return MINUS;
+
+				case '*':
+					fin.get( lex.actchar );
+					return MULT;
+
+				case '/':
+					fin.get( lex.actchar );
+					return DIV;
+
+				case '(':
+					fin.get( lex.actchar );
+					return KLAUF;
+
+				case ')':
+					fin.get( lex.actchar );
+					return KLZU;
+
+				case '$':
+					fin.get( lex.actchar );
+					return PROGEND;
+					
 				default:
 					error(lex, 32);
 					break;
