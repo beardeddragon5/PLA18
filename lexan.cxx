@@ -122,12 +122,12 @@ symbol_t nextsymbol(lexan_t& lex) {
 	char lexbuf[BSIZE];		/* lokaler Puffer für Eingabezeichen */
 	while( !fin.eof() ) {			/* Eingabe-Dateiende nicht erreicht */
     /* Blank und Tab in Ausgabedatei kopieren und überlesen */
-		if ( lex.actchar == ' ' || lex.actchar == '\t' ) {
-      		fout.put(lex.actchar);
+		if ( lex.actchar == ' ' || lex.actchar == '\t' || lex.actchar == '\r' ) {
+      		//fout.put(lex.actchar);
 			fin.get(lex.actchar);
 
 		/* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
-		} else if ( lex.actchar == '\n' || lex.actchar == '\r' ) {
+		} else if ( lex.actchar == '\n' ) {
 			fout.put(lex.actchar);
 			fin.get(lex.actchar);
 			lex.lineno++;
@@ -140,11 +140,10 @@ symbol_t nextsymbol(lexan_t& lex) {
 			fout.put( lex.actchar );
 			zahl[b++] = lex.actchar;
 			fin.get( lex.actchar );
-			fout.put( lex.actchar );
 			while ( isdigit( lex.actchar ) || lex.actchar == '.' ) {
 				zahl[b++] = lex.actchar;
-				fin.get( lex.actchar );
 				fout.put( lex.actchar );
+				fin.get( lex.actchar );
 			}
 			zahl[b] = '\0';
 			

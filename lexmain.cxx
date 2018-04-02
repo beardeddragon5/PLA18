@@ -24,16 +24,16 @@ int main(int argc, char** argv) {
 	lexan_t* lex = initialize(argc, argv);
 	lexan_t& lexan = *lex;
 
-	/* 1. Symbol lesen  */
-	lookahead = nextsymbol( lexan );
+	int lineno = -1;
 
-	/* Symbol ausgeben */
-	fout << "		Tokentyp=    " << lookahead;
-
-	 /* Symbole aus Eingabedatei lesen bis Dateiende */
-  	while (lookahead != DONE) {
+	do {
+		if ( lexan.lineno != lineno ) {
+			fout << "Line: " << lexan.lineno << endl;
+			lineno = lexan.lineno;
+		}
 		lookahead = nextsymbol( lexan );
-		fout << "		Tokentyp=    " << lookahead;
- 	}
+		fout << "\t\tTokentyp=" << lookahead << endl;
+	} while ( lookahead != DONE );
+
 	exit(0); 	/* Erfolg */
 }
