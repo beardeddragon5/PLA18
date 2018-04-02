@@ -73,8 +73,8 @@ struct symbol_t {
     ~symbol_t() {}
 
     tokentype_t type;       /* type of the token */
+    string idname;      /* name of identifier */
 	union {
-		string idname;      /* name of identifier */
 		double realnum;     /* value of double-konstant */
 		int num;            /* value of integer-konstant */
 	};
