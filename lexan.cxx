@@ -76,7 +76,7 @@ struct ressw restable [] = {
    falls gefunden,
    sonst 0
 */
-int lookforres( char *s ) {
+int lookforres( const char *s ) {
 	struct ressw *ptr;
 	for ( ptr = restable; ptr < &restable[NORW]; ptr++ ) {
 		if (strcmp(ptr->ressymbol, s) == 0) {
@@ -122,12 +122,12 @@ symbol_t nextsymbol(lexan_t& lex) {
 	char lexbuf[BSIZE];		/* lokaler Puffer für Eingabezeichen */
 	while( !fin.eof() ) {			/* Eingabe-Dateiende nicht erreicht */
     /* Blank und Tab in Ausgabedatei kopieren und überlesen */
-		if ( lex.actchar == ' ' || lex.actchar == '\t' ) {
-      		fout.put(lex.actchar);
+		if ( lex.actchar == ' ' || lex.actchar == '\t' || lex.actchar == '\r' ) {
+      		//fout.put(lex.actchar);
 			fin.get(lex.actchar);
 
 		/* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
-		} else if ( lex.actchar == '\n' || lex.actchar == '\r' ) {
+		} else if ( lex.actchar == '\n' ) {
 			fout.put(lex.actchar);
 			fin.get(lex.actchar);
 			lex.lineno++;
@@ -140,11 +140,10 @@ symbol_t nextsymbol(lexan_t& lex) {
 			fout.put( lex.actchar );
 			zahl[b++] = lex.actchar;
 			fin.get( lex.actchar );
-			fout.put( lex.actchar );
 			while ( isdigit( lex.actchar ) || lex.actchar == '.' ) {
 				zahl[b++] = lex.actchar;
-				fin.get( lex.actchar );
 				fout.put( lex.actchar );
+				fin.get( lex.actchar );
 			}
 			zahl[b] = '\0';
 			
@@ -182,34 +181,98 @@ symbol_t nextsymbol(lexan_t& lex) {
 				ident += lex.actchar;
 				fout.put(lex.actchar);
 			}
-			if(lookforres(c_str(ident)){
+			if ( lookforres( ident.c_str() ) ) {
 				return ident;
-			}else{
-				return (tokentype_t) lookforres(c_str(ident);
+			} else {
+				return (tokentype_t) lookforres( ident.c_str() );
 			}
-			//lookforres
-			// TODO
-			fout.put(lex.actchar); // prevent from
-			fin.get(lex.actchar); // infinity loop
 
 		/***** Sonderzeichen oder Operatoren erkennen ***************/
 		} else {
 			fout.put(lex.actchar);				/* Zeichen in Ausgabedatei */
 			switch( lex.actchar) {
 				case '=':
-					fin.get(lex.actchar);
+					fin.get(lex.actchar);;
 					return EQ;
 
+				case '<':
+					fin.get(lex.actchar);
+					switch ( lex.actchar ) {
+						case '=':
+							fout.put(lex.actchar);
+							fin.get( lex.actchar );
+							return LE;
+						default:
+							return LT;
+					}
 
+				case '!':
+					fin.get( lex.actchar );
+					fout.put( lex.actchar );
+					if ( lex.actchar != '=' ) {
+						error( lex, 32 );
+					}
+					fin.get( lex.actchar );
+					return NE;
 
+				case '>':
+					fin.get( lex.actchar );
 
+					switch ( lex.actchar ) {
+						case '=':
+							fin.get( lex.actchar );
+							return GE;
+						default:
+							return GT;
+					}
 
+				case ':':
+					fin.get( lex.actchar );
+					switch ( lex.actchar ) {
+						case '=':
+							fout.put( lex.actchar );
+							fin.get( lex.actchar );
+							return ASS;
+						default:
+							return COLON;
+					}
 
-
-
-
-				// TODO
+				case ',':
+					fin.get( lex.actchar );
+					return KOMMA;
 				
+				case ';':
+					fin.get( lex.actchar );
+					return SEMICOLON;
+
+				case '+':
+					fin.get( lex.actchar );
+					return PLUS;
+
+				case '-':
+					fin.get( lex.actchar );
+					return MINUS;
+
+				case '*':
+					fin.get( lex.actchar );
+					return MULT;
+
+				case '/':
+					fin.get( lex.actchar );
+					return DIV;
+
+				case '(':
+					fin.get( lex.actchar );
+					return KLAUF;
+
+				case ')':
+					fin.get( lex.actchar );
+					return KLZU;
+
+				case '$':
+					fin.get( lex.actchar );
+					return PROGEND;
+					
 				default:
 					error(lex, 32);
 					break;
