@@ -46,7 +46,7 @@ parsemain: parsemain.o init.o error.o lexan.o symbol.o parser.o
 # bekannt gemacht werden. Dies geschieht in den Dateien mit der Endung .d
 # GCC kann diese automatisch mit dem Schalter -M aus Quelltexten erstellen.
 %.d: %.cxx
-	@mkdir -p build
+	@mkdir build
 	g++ -M $^ > build/$@
 
 # hier werden sie inkludiert

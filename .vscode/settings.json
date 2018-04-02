@@ -10,7 +10,9 @@
         "ratio": "cpp",
         "type_traits": "cpp",
         "*.ipp": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "ostream": "cpp",
+        "xlocnum": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

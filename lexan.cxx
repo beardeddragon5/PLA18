@@ -176,7 +176,18 @@ symbol_t nextsymbol(lexan_t& lex) {
 			int b = 0 ;				/* Zeichenzahl */
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					solange Buchstaben oder Ziffern folgen --> Identifikator */
-
+			string ident;
+			while( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
+				fin.get(lex.actchar); // infinity loop
+				ident += lex.actchar
+				fout.put(lex.actchar);
+			}
+			if(lookforres(c_str(ident)){
+				return ident;
+			}else{
+				return (tokentype_t) lookforres(c_str(ident);
+			}
+			//lookforres
 			// TODO
 			fout.put(lex.actchar); // prevent from
 			fin.get(lex.actchar); // infinity loop
@@ -188,6 +199,14 @@ symbol_t nextsymbol(lexan_t& lex) {
 				case '=':
 					fin.get(lex.actchar);
 					return EQ;
+
+
+
+
+
+
+
+
 
 				// TODO
 				
