@@ -179,7 +179,7 @@ symbol_t nextsymbol(lexan_t& lex) {
 			string ident;
 			while( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
 				fin.get(lex.actchar); // infinity loop
-				ident += lex.actchar
+				ident += lex.actchar;
 				fout.put(lex.actchar);
 			}
 			if(lookforres(c_str(ident)){
