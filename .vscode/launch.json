@@ -1,0 +1,34 @@
+{
+    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(lldb) Launch lexmain",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/lexmain",
+            "args": [ "-t", "trace.out", "-s", "sym.out", "pla_korrekt.tst", "output.out"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build-lexmain"
+        },
+        {
+            "name": "(lldb) Launch parsemain",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/parsemain",
+            "args": [ "-t", "trace.out", "-s", "sym.out", "pla_korrekt.tst", "output.out"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build-parsemain"
+        }
+    ]
+}

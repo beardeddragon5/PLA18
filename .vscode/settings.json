@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp",
+        "type_traits": "cpp",
+        "*.ipp": "cpp",
+        "*.tcc": "cpp"
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "build": true
+    }
+}
