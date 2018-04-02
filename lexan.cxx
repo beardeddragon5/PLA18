@@ -176,23 +176,27 @@ symbol_t nextsymbol(lexan_t& lex) {
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					solange Buchstaben oder Ziffern folgen --> Identifikator */
 			string ident;
+
+			ident += lex.actchar;
+			fout.put(lex.actchar);
+
 			while( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
 				fin.get(lex.actchar); // infinity loop
 				ident += lex.actchar;
 				fout.put(lex.actchar);
 			}
-			if ( lookforres( ident.c_str() ) ) {
-				return ident;
-			} else {
-				return (tokentype_t) lookforres( ident.c_str() );
+			if(lookforres(ident.c_str())){
+				return symbol_t(ident);
+			}else{
+				return symbol_t((tokentype_t) lookforres(ident.c_str()));
 			}
-
+			
 		/***** Sonderzeichen oder Operatoren erkennen ***************/
 		} else {
 			fout.put(lex.actchar);				/* Zeichen in Ausgabedatei */
 			switch( lex.actchar) {
 				case '=':
-					fin.get(lex.actchar);;
+					fin.get(lex.actchar);
 					return EQ;
 
 				case '<':
@@ -241,7 +245,7 @@ symbol_t nextsymbol(lexan_t& lex) {
 					fin.get( lex.actchar );
 					return KOMMA;
 				
-				case ';':
+							case ';':
 					fin.get( lex.actchar );
 					return SEMICOLON;
 
@@ -272,7 +276,7 @@ symbol_t nextsymbol(lexan_t& lex) {
 				case '$':
 					fin.get( lex.actchar );
 					return PROGEND;
-					
+
 				default:
 					error(lex, 32);
 					break;

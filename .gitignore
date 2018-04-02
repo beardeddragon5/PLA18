@@ -1,5 +1,7 @@
 *.d
 *.o
 lexmain
+lexmain.exe
+out.txt
 parsemain
 *.out
