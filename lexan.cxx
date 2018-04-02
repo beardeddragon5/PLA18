@@ -76,7 +76,7 @@ struct ressw restable [] = {
    falls gefunden,
    sonst 0
 */
-int lookforres( char *s ) {
+int lookforres( const char *s ) {
 	struct ressw *ptr;
 	for ( ptr = restable; ptr < &restable[NORW]; ptr++ ) {
 		if (strcmp(ptr->ressymbol, s) == 0) {
@@ -176,10 +176,17 @@ symbol_t nextsymbol(lexan_t& lex) {
 			int b = 0 ;				/* Zeichenzahl */
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					solange Buchstaben oder Ziffern folgen --> Identifikator */
-
-			// TODO
-			fout.put(lex.actchar); // prevent from
-			fin.get(lex.actchar); // infinity loop
+			string ident;
+			while( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
+				fin.get(lex.actchar); // infinity loop
+				ident += lex.actchar;
+				fout.put(lex.actchar);
+			}
+			if ( lookforres( ident.c_str() ) ) {
+				return ident;
+			} else {
+				return (tokentype_t) lookforres( ident.c_str() );
+			}
 
 		/***** Sonderzeichen oder Operatoren erkennen ***************/
 		} else {
