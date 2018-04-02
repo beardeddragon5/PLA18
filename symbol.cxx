@@ -144,11 +144,13 @@ st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
 		case INTIDENT:   /* Bei Identifikator vom Typ int */
 			neu.wertaddr = 0;
 			TRACE( lexan, "insert INTIDENT" );
+			TRACE_END();
 			break;
 
 		case REALIDENT:   /* Bei Identifikator vom Typ real  */
 			neu.wertaddr = 0;
 			TRACE( lexan, "insert REALIDENT" );
+			TRACE_END();
 			break;
 
 		case PROC: /* bei Prozedur: ST für lokale Deklarationen der neuen Prozedur

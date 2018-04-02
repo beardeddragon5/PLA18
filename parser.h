@@ -31,8 +31,9 @@ struct parser_t {
 };
 
 static inline void TRACE( parser_t& parser, string type ) {
-    if ( tracesw ) trace << "\n Zeile:" << parser.lexan.lineno << type;
+    TRACE( parser.lexan, type );
 }
+
 
 
 void constdecl( parser_t& parser );					/* Verarbeiten einer Konstantendeklaration */

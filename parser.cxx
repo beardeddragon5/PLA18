@@ -83,6 +83,7 @@ int factor( parser_t& parser ) {
 		default:	// kein korrekter Faktor
 			error( parser.lexan, 27);
 	}	// endswitch (lookahead)
+	TRACE_END();
 	return (0);
 } 	// end factor
 
@@ -111,6 +112,7 @@ int term( parser_t& parser ) {
 	  	parser.next();
 		ret = factor( parser );
 	}
+	TRACE_END();
 	return(0);
  }
 
@@ -139,6 +141,7 @@ int exp( parser_t& parser ) {
 		typ_right = term( parser );
 		// nach korrektem Ende wurde nächstes Symbol gelesen
 	}
+	TRACE_END();
 	return (0);
 }
 
@@ -176,6 +179,7 @@ int condition( parser_t& parser ) {
 	if (typ_left != typ_right)
 		errortext( parser.lexan, "Typen der Operanden nicht kompatibel");
 
+	TRACE_END();
 	return(typ_left);
 }
 
@@ -202,7 +206,7 @@ void statement( parser_t& parser ) {
 
 	// überprüfung des aktuellen lex. Symbols
 	// TODO
-	return;	// end statement
+	TRACE_END();
 }
 
 
@@ -228,7 +232,7 @@ void procdecl( parser_t& parser ) {
 	symtable* neusym;		// Zeiger auf Symboltabelle
 
 	// TODO
-	return;   // end procdecl
+	TRACE_END();
 }
 
 
@@ -251,7 +255,7 @@ void vardecl( parser_t& parser ) {
 	
 	// nach var muss Identifikator folgen
 	// TODO
-  	return;
+  	TRACE_END();
 }
 
 /****************** constdecl ***************************************************/
@@ -273,7 +277,7 @@ void constdecl( parser_t& parser ) {
 	st_entry *neu, *found;
 	// auf const muss IDENT folgen
   	// TODO
-  	return;		// end constdecl
+  	TRACE_END();
 }
 
 
@@ -318,7 +322,7 @@ void block( parser_t& parser, symtable * neusym) {
 	// bei Blockende : Symboltabelle zurücksetzen
 	// actsym = Zeiger auf vorherige Symboltabelle
   	// TODO
-  	return;
+	TRACE_END();
 }
 
 
@@ -352,4 +356,5 @@ void program( parser_t& parser ) {
 	// Dateiende erreicht ?
 	if (parser.lookahead != DONE)
 		error( parser.lexan, 33 ); // noch Symbole in Eingabedatei nach RPOGRAM
+	TRACE_END();
 }
