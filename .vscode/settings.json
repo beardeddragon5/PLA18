@@ -8,5 +8,14 @@
         "**/*.d": true,
         "**/*.o": true,
         "build": true
+    },
+    "files.associations": {
+        "istream": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xlocnum": "cpp",
+        "xlocale": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp"
     }
 }

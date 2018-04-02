@@ -1,0 +1,5 @@
+Line: 1
+	const 		Tokentyp=symbol(INVALID)
+ c 		Tokentyp=symbol(INVALID)
+ =		Tokentyp=symbol(EQ)
+ 6;		Tokentyp=symbol(INTNUM, num = 6)
