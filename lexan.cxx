@@ -128,7 +128,7 @@ symbol_t nextsymbol(lexan_t& lex) {
 
 		/* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
 		} else if ( lex.actchar == '\n' ) {
-			fout.put(lex.actchar);
+			//fout.put(lex.actchar);
 			fin.get(lex.actchar);
 			lex.lineno++;
 
