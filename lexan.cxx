@@ -182,13 +182,15 @@ symbol_t nextsymbol(lexan_t& lex) {
 
 			while( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
 				fin.get(lex.actchar); // infinity loop
+				if( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
 				ident += lex.actchar;
 				fout.put(lex.actchar);
+				}
 			}
 			if(lookforres(ident.c_str())){
-				return symbol_t(ident);
-			}else{
 				return symbol_t((tokentype_t) lookforres(ident.c_str()));
+			}else{
+				return symbol_t(ident);
 			}
 			
 		/***** Sonderzeichen oder Operatoren erkennen ***************/
