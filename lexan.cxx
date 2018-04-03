@@ -14,83 +14,58 @@
 #include "lexan.h"
 #endif
 
-#define NORW   14   		/* Zahl der reservierten Worte */
-#define RWSYMLEN  15		/* Max. Länge reservierter Symbole */
-
 #include <climits>
 #include <cmath>
 
-
-// int lineno;					/* Zeilennummer */
-
-// int num ;           /* Wert einer int-Konstanten  */
-// double realnum; 		/* Wert einer real-Konstanten*/
-
-// char idname[BSIZE];      /* Name eines Bezeichners ; wird vom Parser weiterverwendet */
-
-
-// char actchar;       /* gelesenes Zeichen */
-
-
-/*  Um Bezeichner von reservierten Symbolene unterscheiden zu können,
-wird eine Tabelle reservierte Worte verwendet (restable).
-
-Die Tabelle enthält Einträge für jedes Schlüsselwort, bestehend aus
-dem Schlüsselwort selbst und dem zugehörigen Tokentyp (Codierung vgl.global.h):
-
-Bei Erkennen eines möglichen Bezeichners wird zuerst die Tabelle
-der reservierten Symbole durchsucht (lookforres);
-wird ein Schlüsselwort gefunden, liefert lookforres den dem Schlüsselwort
-zugeordneten Tokentyp; sonst 0. Bei Ergebnis 0 liegt dann tatsächlich ein
-Bezeichner vor.
-*/
-
-
-/* Struktur eines Eintrags in der Tabelle reservierter Symbole */
-struct ressw {
-  char ressymbol [RWSYMLEN];			/* Symbol */
-  int token;							/* zugehöriger Tokentyp */
+/**
+ * keyword_t is a struct mapping a keyword name used in pla18
+ * to a tokentype used by the compiler
+ */
+struct keyword_t {
+  string name;			
+  tokentype_t token;							
 };
 
 /* Tabelle reservierter Worte */
-struct ressw restable [] = {
-  {"const", CONST},
-	{"var", VAR},
-	{"procedure", PROCEDURE},
-	{"call", CALL},
-	{"begin", BEGIN},
-	{"end", END},
-	{"if", IF},
-	{"then", THEN},
-	{"else",ELSE},
-	{"while",WHILE},
-	{"do", DO},
-	{"int", INT},
-	{"real", REAL},
-	{"fi", FI}
+struct keyword_t keywords [] = {
+  	{ "const", 		CONST		},
+	{ "var", 		VAR			},
+	{ "procedure", 	PROCEDURE	},
+	{ "call", 		CALL		},
+	{ "begin", 		BEGIN		},
+	{ "end", 		END			},
+	{ "if", 		IF			},
+	{ "then", 		THEN		},
+	{ "else", 		ELSE		},
+	{ "while", 		WHILE		},
+	{ "do", 		DO			},
+	{ "int", 		INT			},
+	{ "real", 		REAL		},
+	{ "fi", 		FI			}
 };
 
-/* Suchen nach einem reservierten Symbol */
-
-/* Sucht in Tabelle reservierter Worte nach s und liefert zugehörigen Token
-   falls gefunden,
-   sonst 0
-*/
-int lookforres( const char *s ) {
-	struct ressw *ptr;
-	for ( ptr = restable; ptr < &restable[NORW]; ptr++ ) {
-		if (strcmp(ptr->ressymbol, s) == 0) {
-			return (ptr->token); /* Symbol gefunden */
+/**
+ * lookforKeyword looks if given key is a reserved keyword in pla.
+ * 
+ * This is used to check if a read string is a identifier or a keyword.
+ * 
+ * @param key string to look for
+ * @return token of reserved keyword or INVALID 
+ */
+tokentype_t lookforKeyword( string key ) {
+	int length = sizeof(keywords) / sizeof(keyword_t); 
+	for ( int i = 0; i < length; i++ ) {
+		if ( keywords[i].name == key ) {
+			return keywords[i].token;
 		}
 	}
-	return(0); /* Symbol nicht gefunden */
+	return INVALID;
 }
 
-/******************* Initialisieren des Scanners **********************/
-
-/* wird aufgerufen von  initialize () aus init.cxx ;
-nimmt Vorbesetzungen der Variablen num, realnum,  idname und lineno vor;
-liest das erste Zeichen aus der Eingabe */
+/** 
+ * Initalize a new lexan_t entity starting at line number 1 and reading the
+ * first character from fin
+ */
 lexan_t* initlexan() {
 	lexan_t* lex = (lexan_t*) malloc( sizeof(lexan_t) );
 	lex->lineno = 1;
@@ -98,62 +73,45 @@ lexan_t* initlexan() {
 	return lex;
 }
 
-/*
-*******************************************************************************
-********** Funktion nextsymbol ************************************************
-*******************************************************************************
-
-**** zentrale Funktion zum Lesen des nächsten lexikalischen Symbols ***************
-*****  identifiziert nächstes lexikalisches Symbol der Eingabe **********
-
-***** WICHTIG!!!!!
-		Bei Aufruf von nextsymbol muss  sich das nächste Eingabezeichen bereits in actchar befinden
-*******
-
-liefert Codierung des nächsten Symbols (token):
-   - Konstante:				   token == INTNUM und Wert der Konstanten in Variable num
-									       token == REALNUM und Wert in realnum
-   - Bezeichner:				 token == ID  und Zeiger auf Name in idname
-	 - Schlüsselwort:			 token == Tokentyp des reservierten Symbols nach Suche in restable
-	 - Operatoren,Sonderzeichen :entsprechende Token
-**/
-symbol_t nextsymbol(lexan_t& lex) {
-	int token;
-	char lexbuf[BSIZE];		/* lokaler Puffer für Eingabezeichen */
-	while( !fin.eof() ) {			/* Eingabe-Dateiende nicht erreicht */
-    /* Blank und Tab in Ausgabedatei kopieren und überlesen */
-		if ( lex.actchar == ' ' || lex.actchar == '\t' || lex.actchar == '\r' ) {
-      		//fout.put(lex.actchar);
+/**
+ * nextsymbol returns the next symbol from the inputfile.
+ * 
+ * IMPORTANT!!!: lexan must always be pointing to the next character after the last found symbol
+ * 
+ * @param lex the used lexan instance with the current character and linenumber
+ * @return the found symbol
+ */
+token_t nextsymbol(lexan_t& lex) {
+	while( !fin.eof() ) {
+		if ( isspace( lex.actchar ) && lex.actchar != '\n' ) {
+			/* ignore whitespaces except for the newline */
 			fin.get(lex.actchar);
-
-		/* Newline in Ausgabedatei kopieren, überlesen/entfernen, Zeilennummer erhöhen */
 		} else if ( lex.actchar == '\n' ) {
-			//fout.put(lex.actchar);
+			/* found newline => increment linenumber of lexan_t */
 			fin.get(lex.actchar);
 			lex.lineno++;
-
-		/***** actchar ist Ziffer --> Konstanten erkennen  *****/
+			fout << "line: " << lex.lineno << endl;
 		} else if ( isdigit(lex.actchar) ) {
-			char zahl [BSIZE];	 /* Puffer für Ziffern */
-			int b = 0;				   /* Zeichenzahl*/
+			/* found number. regex: [0-9]+\.?[0-9]* 	*/
+			char zahl[BSIZE];
+			int b = 0;
+			bool isReal = false;
 
 			fout.put( lex.actchar );
 			zahl[b++] = lex.actchar;
 			fin.get( lex.actchar );
-			while ( isdigit( lex.actchar ) || lex.actchar == '.' ) {
+			while ( isdigit( lex.actchar ) || ( !isReal && lex.actchar == '.' ) ) {
+				if ( lex.actchar == '.' ) {
+					isReal = true;
+				}
 				zahl[b++] = lex.actchar;
 				fout.put( lex.actchar );
 				fin.get( lex.actchar );
-			}
-			zahl[b] = '\0';
-			
-			bool isReal = false;
-			for ( int i = 0; i < b; i++ ) {
-				if ( zahl[i] == '.' ) {
-					isReal = true;
-					break;
+				if ( b > BSIZE ) {
+					error( lex, 24 );
 				}
 			}
+			zahl[b] = '\0';
 
 			if ( isReal ) {
 				double real = strtod( zahl, nullptr );
@@ -170,30 +128,31 @@ symbol_t nextsymbol(lexan_t& lex) {
 				error(lex, 24); // To big number
 			}
 			return (int) val;
-		/***** actchar ist Buchstabe -->  Identifikatoren erkennen ****/
 		} else if ( isalpha(lex.actchar) ) {
-			int b = 0 ;				/* Zeichenzahl */
-					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
-					solange Buchstaben oder Ziffern folgen --> Identifikator */
+			/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
+			 * solange Buchstaben oder Ziffern folgen --> Identifikator 
+			 */
 			string ident;
 
 			ident += lex.actchar;
-			fout.put(lex.actchar);
+			fout.put( lex.actchar );
 
-			while( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
-				fin.get(lex.actchar); // infinity loop
-				if( isalpha(lex.actchar) ||  isdigit(lex.actchar)){
-				ident += lex.actchar;
-				fout.put(lex.actchar);
+			while ( isalpha( lex.actchar ) ||  isdigit( lex.actchar ) ) {
+				fin.get( lex.actchar );
+				if ( isalpha( lex.actchar ) ||  isdigit( lex.actchar ) ) {
+					ident += lex.actchar;
+					fout.put( lex.actchar );
+				}
+				if ( ident.length() > BSIZE ) {
+					error( lex, 32 );
 				}
 			}
-			if(lookforres(ident.c_str())){
-				return symbol_t((tokentype_t) lookforres(ident.c_str()));
-			}else{
-				return symbol_t(ident);
+
+			tokentype_t type = lookforKeyword( ident );
+			if ( type != INVALID ) {
+				return type;
 			}
-			
-		/***** Sonderzeichen oder Operatoren erkennen ***************/
+			return ident;
 		} else {
 			fout.put(lex.actchar);				/* Zeichen in Ausgabedatei */
 			switch( lex.actchar) {
@@ -291,46 +250,46 @@ symbol_t nextsymbol(lexan_t& lex) {
 string tokentype_toString( tokentype_t type ) {
 	switch( type ) {
 		default:
-		case INVALID: return "INVALID"; 
-		case INTNUM: return "INTNUM";
-		case REALNUM: return "REALNUM";
-		case ID: return "ID";
-		case CONST: return "CONST";
-		case VAR: return "VAR";
+		case INVALID: 	return "INVALID"; 
+		case INTNUM: 	return "INTNUM";
+		case REALNUM: 	return "REALNUM";
+		case ID: 		return "ID";
+		case CONST: 	return "CONST";
+		case VAR: 		return "VAR";
 		case PROCEDURE: return "PROCEDURE";
-		case CALL: return "CALL";
-		case BEGIN: return "BEGIN";
-		case END: return "END";
-		case IF: return "IF";
-		case THEN: return "THEN";
-		case ELSE: return "ELSE";
-		case WHILE: return "WHILE";
-		case DO: return "DO";
-		case EQ: return "EQ";
-		case NE: return "NE";
-		case LT: return "LT";
-		case LE: return "LE";
-		case GT: return "GT";
-		case GE: return "GE";
-		case ASS: return "ASS";
-		case KOMMA: return "KOMMA";
+		case CALL: 		return "CALL";
+		case BEGIN: 	return "BEGIN";
+		case END: 		return "END";
+		case IF: 		return "IF";
+		case THEN: 		return "THEN";
+		case ELSE: 		return "ELSE";
+		case WHILE: 	return "WHILE";
+		case DO: 		return "DO";
+		case EQ: 		return "EQ";
+		case NE: 		return "NE";
+		case LT: 		return "LT";
+		case LE: 		return "LE";
+		case GT: 		return "GT";
+		case GE: 		return "GE";
+		case ASS: 		return "ASS";
+		case KOMMA: 	return "KOMMA";
 		case SEMICOLON: return "SEMICOLON";
-		case PLUS: return "PLUS";
-		case MINUS: return "MINUS";
-		case MULT: return "MULT";
-		case DIV: return "DIV";
-		case KLAUF: return "KLAUF";
-		case KLZU: return "KLZU";
-		case PROGEND: return "PROGEND";
-		case COLON: return "COLON";
-		case INT: return "INT";
-		case REAL: return "REAL";
-		case FI: return "FI";
-		case DONE: return "DONE";
+		case PLUS: 		return "PLUS";
+		case MINUS: 	return "MINUS";
+		case MULT: 		return "MULT";
+		case DIV: 		return "DIV";
+		case KLAUF: 	return "KLAUF";
+		case KLZU: 		return "KLZU";
+		case PROGEND: 	return "PROGEND";
+		case COLON: 	return "COLON";
+		case INT: 		return "INT";
+		case REAL: 		return "REAL";
+		case FI: 		return "FI";
+		case DONE: 		return "DONE";
 	}
 }
 
-std::ostream& operator<<( std::ostream& os, const symbol_t& symbol ) {
+std::ostream& operator<<( std::ostream& os, const token_t& symbol ) {
 	os << "symbol(" << tokentype_toString(symbol.type);
 
 	switch ( symbol.type ) {

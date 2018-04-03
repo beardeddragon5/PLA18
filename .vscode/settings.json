@@ -18,6 +18,22 @@
         "xstring": "cpp",
         "xutility": "cpp",
         "array": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "typeinfo": "cpp",
+        "iosfwd": "cpp",
+        "algorithm": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "__functional_base": "cpp",
+        "__functional_base_03": "cpp",
+        "__tuple": "cpp",
+        "chrono": "cpp",
+        "functional": "cpp",
+        "limits": "cpp",
+        "memory": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp",
+        "iterator": "cpp"
     }
 }

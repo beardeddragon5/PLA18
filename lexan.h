@@ -10,7 +10,7 @@
 /* Definition der Codierung für Tokentypen */
 
 enum tokentype_t {
-    INVALID = -1, 
+    INVALID = 0, 
     INTNUM = 2561,      /* Int-Konstante */
     REALNUM,            /* Real-Konstante */
     ID = 257,           /* Identifikator */
@@ -48,79 +48,40 @@ enum tokentype_t {
     DONE = 300          /* Ende-Token */
 };
 
-struct symbol_t {
-    symbol_t( ) : symbol_t( INVALID ) { }
-    symbol_t( tokentype_t type ): type( type ) {
-        switch ( type ) {
-            default:
-            case INTNUM:
-                num = 0;
-                break;
-            case REALNUM:
-                realnum = 0.0;
-                break;
-            case ID:
-                idname = "";
-                break;
-        }
-    };
-    symbol_t( int num ) : type( INTNUM ), num( num ) { };
-    symbol_t( double real ) : type( REALNUM ), realnum( real ) { };
-    symbol_t( string id ) : type( ID ), idname( id ) { };
-    symbol_t( const symbol_t& symbol ) {
-        *this = symbol;
-    }
-    ~symbol_t() {}
+/**
+ * token_t holds a single symbol.
+ * 
+ * If the symbol is of type INTNUM, REALNUM, or ID the additional fields are populated.
+ * 
+ * INTNUM:      num
+ * REALNUM:     real
+ * ID:          idname
+ */
+struct token_t {
+    token_t( ) : token_t( INVALID ) { }
+    token_t( tokentype_t type );
+    token_t( int num ) : type( INTNUM ), num( num ) { };
+    token_t( double real ) : type( REALNUM ), realnum( real ) { };
+    token_t( string id ) : type( ID ), idname( id ) { };
+    token_t( const token_t& symbol );
+    ~token_t() {}
 
     tokentype_t type;       /* type of the token */
-    string idname;      /* name of identifier */
+    string idname;          /* name of identifier */
 	union {
 		double realnum;     /* value of double-konstant */
 		int num;            /* value of integer-konstant */
 	};
 
-    symbol_t& operator=(const symbol_t& symbol) {
-        this->type = symbol.type;
-        switch ( this->type ) {
-            case INTNUM:
-                this->num = symbol.num;
-                break;
-            case REALNUM:
-                this->realnum = symbol.realnum;
-                break;
-            case ID:
-                this->idname = symbol.idname;
-                break;
-            default:
-                break;
-        }
-        return *this;
-    }
-
-    bool operator==(const symbol_t& b) {
-        if ( this->type != b.type ) {
-            return false;
-        }
-        switch ( this->type ) {
-            case INTNUM:
-                return this->num == b.num;
-            case REALNUM:
-                return this->realnum == b.realnum;
-            case ID:
-                return this->idname == b.idname;
-            default:
-                return true;
-        }
-    }
-
-    bool operator!=(const symbol_t& b) {
-        return ! ( *this == b );
-    }
-
+    token_t& operator= ( const token_t& symbol );
+    bool operator== ( const token_t& b );
+    bool operator!= ( const token_t& b );
 };
 
-
-
+/**
+ * lexan_t holds information of the current character read from the inputfile and the
+ * current line in the inputfile
+ */
 struct lexan_t {
 	int lineno;         /* Zeilennummer */
 	char actchar;       /* gelesenes Zeichen */
@@ -142,8 +103,8 @@ static inline void TRACE_END() {
 }
 
 lexan_t* initlexan();                       /* Scanner initialisieren */
-symbol_t nextsymbol(lexan_t&); 				/* liest nächstes Symbol der Eingabe */	
+token_t nextsymbol(lexan_t&); 				/* liest nächstes Symbol der Eingabe */	
 int lookforres( char * );	/* sucht in Tabelle der res. Symbole nach Zeichenkette */
 
 string tokentype_toString( tokentype_t type );
-std::ostream& operator<<( std::ostream& os, const symbol_t& symbol );
+std::ostream& operator<<( std::ostream& os, const token_t& symbol );

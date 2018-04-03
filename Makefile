@@ -28,25 +28,25 @@ LDFLAGS=
 .PHONY: clean
 
 # Uebersetzung des Scanners aus Aufgabe 1
-lexmain: lexmain.o init.o error.o lexan.o symbol.o parser.o
-	g++ $(LDFLAGS) -o $@ $^
+lexmain: lexmain.o init.o error.o lexan.o symbol.o parser.o token.o
+	g++ -std=c++11 $(LDFLAGS) -o $@ $^
 
 # Uebersetzung des Parsers aus Aufgabe 1
-parsemain: parsemain.o init.o error.o lexan.o symbol.o parser.o
-	g++ $(LDFLAGS) -o $@ $^
+parsemain: parsemain.o init.o error.o lexan.o symbol.o parser.o token.o
+	g++ -std=c++11 $(LDFLAGS) -o $@ $^
 
 
 # allgemeine Regel zur Erstellung eines Object-Files aus einer
 # C++ Quelldatei
 %.o: %.cxx
-	g++ $(CFLAGS) -c -o $@ $<
+	g++ -std=c++11 $(CFLAGS) -c -o $@ $<
 
 
 # da C++-Dateien Header-Dateien inkludieren, sollten deren Abhaengigkeiten
 # bekannt gemacht werden. Dies geschieht in den Dateien mit der Endung .d
 # GCC kann diese automatisch mit dem Schalter -M aus Quelltexten erstellen.
 %.d: %.cxx
-	g++ -M $^ > $@
+	g++ -std=c++11 -M $^ > $@
 
 # hier werden sie inkludiert
 # Falls sie nicht existieren, wird make das zwar melden, diese Dateien
