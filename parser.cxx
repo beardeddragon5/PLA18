@@ -171,6 +171,7 @@ void statement( parser_t& parser ) {
 
 	switch ( parser.lookahead.type ) {
 		case ID:
+		{
 			st_entry* entry = lookup( parser.lookahead.idname );
 			if ( entry == nullptr ) {
 				error( parser.lexan, 10 ); 
@@ -199,7 +200,9 @@ void statement( parser_t& parser ) {
 				error( parser.lexan, 36 );
 			}
 			break;
+		}
 		case CALL:
+		{
 			parser.next();
 
 			if ( parser.lookahead != ID ) {
@@ -215,6 +218,7 @@ void statement( parser_t& parser ) {
 			}
 			parser.next();
 			break;
+		}
 		case BEGIN:
 			do {
 				parser.next();
@@ -454,24 +458,24 @@ void block( parser_t& parser, symtable* newsym ) {
 	actsym = newsym;
 
 	if(parser.lookahead == CONST){
-		constdecl();
+		constdecl( parser );
 		parser.next();
 	}
 
 	if(parser.lookahead == VAR){
-		vardecl();
+		vardecl( parser );
 		parser.next();
 	}
 	if(parser.lookahead != PROCEDURE){
 		error(parser.lexan , 6);
 	}
-	procdecl();
+	procdecl( parser );
 	parser.next();
 
 	if(parser.lookahead != ID){
 		error(parser.lexan , 6);
 	}
-	statement();
+	statement( parser );
 
 	actsym = oldsym;
 
