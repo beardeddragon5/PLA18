@@ -360,6 +360,30 @@ void block( parser_t& parser, symtable* newsym ) {
 	TRACE( parser, "Block");
 
 	// actsym auf neue Symboltabelle setzen
+	symtable* oldsym = actsym;
+	actsym = newsym;
+
+	if(parser.lookahead == CONST){
+		constdecl();
+		parser.next();
+	}
+
+	if(parser.lookahead == VAR){
+		vardecl();
+		parser.next();
+	}
+	if(parser.lookahead != PROCEDURE){
+		error(parser.lexan , 6);
+	}
+	procdecl();
+	parser.next();
+
+	if(parser.lookahead != ID){
+		error(parser.lexan , 6);
+	}
+	statement();
+
+	actsym = oldsym;
 
   	// TODO
 
