@@ -247,6 +247,11 @@ void statement( parser_t& parser ) {
 				case ELSE:
 					parser.next();
 					statement( parser );
+
+					if ( parser.lookahead != FI ) {
+						error( parser.lexan, 39 );
+					}
+					parser.next();
 					break;
 				default:
 					error( parser.lexan, 39 );
