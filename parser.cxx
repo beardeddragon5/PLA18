@@ -226,49 +226,49 @@ void vardecl( parser_t& parser ) {
 	
 	if(parser.lookahead != VAR){
 		//var erwartet
-		error(lexan , 40);
+		error(parser.lexan , 40);
 	}
 	parser.next();
 
 	if(parser.lookahead.type != ID){
-		error(lexan , 4);
+		error(parser.lexan , 4);
 	}else{
 		//doppel declaration
 		if(lookup_in_actsym(parser.lookahead.idname)){
-			error(lexan , 42);
+			error(parser.lexan , 42);
 		}
 	}
 	parser.next();
 
 	if(parser.lookahead != COLON){
-		error(lexan , 41);
+		error(parser.lexan , 41);
 	}
 	parser.next();
 
 	if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
-		error(lexan , 36);
+		error(parser.lexan , 36);
 	}
 	parser.next();
 
 	while(parser.lookahead != SEMICOLON){
 
 		if(parser.lookahead != KOMMA){
-			error(lexan , 5);
+			error(parser.lexan , 5);
 		}
 		parser.next();
 
 		if(parser.lookahead.type != ID){
-			error(lexan , 4);
+			error(parser.lexan , 4);
 		}
 		parser.next();
 
 		if(parser.lookahead != COLON){
-			error(lexan , 41);
+			error(parser.lexan , 41);
 		}
 		parser.next();
 
 		if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
-			error(lexan , 36);
+			error(parser.lexan , 36);
 		}
 		parser.next();
 
