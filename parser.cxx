@@ -178,11 +178,33 @@ void statement( parser_t& parser ) {
  */
 void procdecl( parser_t& parser ) {
 	TRACE( parser, "Procdeklaration");
-	st_entry* neu, *found;          // Zeiger auf ST-Eintrag
+	while ( parser.lookahead == PROCEDURE ) {
+		parser.next();
 
-	symtable* neusym;		// Zeiger auf Symboltabelle
+		if ( parser.lookahead.type != ID ) {
+			error( parser.lexan, 3 );
+		}
 
-	// TODO
+		if ( lookup_in_actsym( parser.lookahead.idname ) != nullptr ) {
+			error( parser.lexan, 34 );
+		}
+
+		st_entry* neu = insert( parser.lexan, PROC, parser.lookahead.idname );
+
+		parser.next();
+
+		if ( parser.lookahead != SEMICOLON ) {
+			error( parser.lexan, 5 );
+		}
+
+		symtable* neusym = create_newsym();
+		block( parser, neusym );
+
+		if ( parser.lookahead != SEMICOLON ) {
+			error( parser.lexan, 5 );
+		}
+		parser.next();
+	}
 	TRACE_END();
 }
 
