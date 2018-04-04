@@ -112,7 +112,10 @@ type_t exp( parser_t& parser ) {
 	// check for multipe term seperated by '+' or '-'
 	while (parser.lookahead == PLUS || parser.lookahead == MINUS ) {
 		parser.next();
-		out = term( parser );
+		type_t lefttype = factor( parser );
+		if ( lefttype == TYPE_REAL ) {
+			out = lefttype;
+		}
 	}
 	TRACE_END();
 	return out;
@@ -385,11 +388,6 @@ void block( parser_t& parser, symtable* newsym ) {
 
 	actsym = oldsym;
 
-  	// TODO
-
-	// bei Blockende : Symboltabelle zurücksetzen
-	// actsym = Zeiger auf vorherige Symboltabelle
-  	// TODO
 	TRACE_END();
 }
 
