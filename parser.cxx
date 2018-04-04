@@ -466,15 +466,8 @@ void block( parser_t& parser, symtable* newsym ) {
 		vardecl( parser );
 		parser.next();
 	}
-	if(parser.lookahead != PROCEDURE){
-		error(parser.lexan , 6);
-	}
 	procdecl( parser );
 	parser.next();
-
-	if(parser.lookahead != ID){
-		error(parser.lexan , 6);
-	}
 	statement( parser );
 
 	actsym = oldsym;

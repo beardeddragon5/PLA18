@@ -17,6 +17,7 @@ wird ein Zeiger auf den Eintrag in lexemes abgelegt */
 #include "error.h"
 #endif
 
+#include <sstream>
 
 char lexemes[STRMAX];		/* Feld f+r Namen der Bezeichner */
 
@@ -171,7 +172,11 @@ st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
   actsym->anzahl++;
 
 	/* Testausgabe */
-	trace  << "\n  ST-Eintrag: " << lastentry -> token  <<  lastentry->name << lastentry-> wertaddr;
+	ostringstream stringStream;
+  stringStream << "ST-Eintrag: " << lastentry->token << lastentry->name << lastentry->wertaddr;
+
+	TRACE( lexan, stringStream.str() );
+	TRACE_END();
 
 	/* Zeiger auf Eintrag als Returnwert liefern */
 	return(lastentry);

@@ -67,11 +67,11 @@ string errtxt[] = {
 /*36*/	"Unzulässiger Typ",
 /*37*/  "Falsche Eintragsart in Symboltabelle",
 /*38*/	"Keine korrekte reelle Konstante ",
-/*39 */	" fi fehlt",
-/*40 */	" Var erwartet",
-/*41 */	" ':' erwartet",
-/*42 */	" Variable bereits deklariert",
-
+/*39*/	" fi fehlt",
+/*40*/	" Var erwartet",
+/*41*/	" ':' erwartet",
+/*42*/	" Variable bereits deklariert",
+/*43*/  "const can not be assigned"
 };
 
 /***************** Fehlerfunktion **********************/
