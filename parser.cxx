@@ -41,25 +41,27 @@ type_t factor( parser_t& parser ) {
 			 * identifier must be declared so
 			 * a valid entry in the symbol table must be set
 			 */	
-			st_entry* found = lookup( parser.lookahead.idname );
-			if ( found == nullptr ) {
-				// not found so exit with error
-				error( parser.lexan, 10);
+			{
+				st_entry* found = lookup( parser.lookahead.idname );
+				if ( found == nullptr ) {
+					// not found so exit with error
+					error( parser.lexan, 10);
+				}
+				symtype_t kind = found->token;
+				// check witch kind of token it is
+				switch ( kind ) {
+					case KONST:
+					case INTIDENT:
+						out = TYPE_INT;
+						break;
+					case REALIDENT:
+						out = TYPE_REAL;
+						break;
+					case PROC:
+						// procedures are not allowed
+						error( parser.lexan, 20);
+				}		
 			}
-			symtype_t kind = found->token;
-			// check witch kind of token it is
-			switch ( kind ) {
-				case KONST:
-				case INTIDENT:
-					out = TYPE_INT;
-					break;
-				case REALIDENT:
-					out = TYPE_REAL;
-					break;
-				case PROC:
-					// procedures are not allowed
-					error( parser.lexan, 20);
-			}			
 			break;
 		default:
 			error( parser.lexan, 27);
