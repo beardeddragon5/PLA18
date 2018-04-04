@@ -112,7 +112,10 @@ type_t exp( parser_t& parser ) {
 	// check for multipe term seperated by '+' or '-'
 	while (parser.lookahead == PLUS || parser.lookahead == MINUS ) {
 		parser.next();
-		out = term( parser );
+		type_t lefttype = factor( parser );
+		if ( lefttype == TYPE_REAL ) {
+			out = lefttype;
+		}
 	}
 	TRACE_END();
 	return out;
@@ -447,12 +450,31 @@ void block( parser_t& parser, symtable* newsym ) {
 	TRACE( parser, "Block");
 
 	// actsym auf neue Symboltabelle setzen
+	symtable* oldsym = actsym;
+	actsym = newsym;
 
-  	// TODO
+	if(parser.lookahead == CONST){
+		constdecl();
+		parser.next();
+	}
 
-	// bei Blockende : Symboltabelle zurücksetzen
-	// actsym = Zeiger auf vorherige Symboltabelle
-  	// TODO
+	if(parser.lookahead == VAR){
+		vardecl();
+		parser.next();
+	}
+	if(parser.lookahead != PROCEDURE){
+		error(parser.lexan , 6);
+	}
+	procdecl();
+	parser.next();
+
+	if(parser.lookahead != ID){
+		error(parser.lexan , 6);
+	}
+	statement();
+
+	actsym = oldsym;
+
 	TRACE_END();
 }
 
