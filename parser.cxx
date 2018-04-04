@@ -196,7 +196,55 @@ void vardecl( parser_t& parser ) {
 	TRACE( parser, "Variablendeklaration");
   	st_entry* neu, *found;
 	
-	// nach var muss Identifikator folgen
+	if(parser.lookahead != VAR){
+		//var erwartet
+		error(lexan , 40);
+	}
+	parser.next();
+
+	if(parser.lookahead.type != ID){
+		error(lexan , 4);
+	}else{
+		//doppel declaration
+		if(lookup_in_actsym(parser.lookahead.idname)){
+			error(lexan , 42);
+		}
+	}
+	parser.next();
+
+	if(parser.lookahead != COLON){
+		error(lexan , 41);
+	}
+	parser.next();
+
+	if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
+		error(lexan , 36);
+	}
+	parser.next();
+
+	while(parser.lookahead != SEMICOLON){
+
+		if(parser.lookahead != KOMMA){
+			error(lexan , 5);
+		}
+		parser.next();
+
+		if(parser.lookahead.type != ID){
+			error(lexan , 4);
+		}
+		parser.next();
+
+		if(parser.lookahead != COLON){
+			error(lexan , 41);
+		}
+		parser.next();
+
+		if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
+			error(lexan , 36);
+		}
+		parser.next();
+
+	}
 	// TODO
   	TRACE_END();
 }
