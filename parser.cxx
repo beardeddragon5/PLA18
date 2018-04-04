@@ -166,8 +166,95 @@ void statement( parser_t& parser ) {
 	st_entry *found;		// Zeiger auf ST-Eintrag
 	int typ_left, typ_right;
 
-	// überprüfung des aktuellen lex. Symbols
-	// TODO
+	switch ( parser.lookahead.type ) {
+		case ID:
+			st_entry* entry = lookup( parser.lookahead.idname );
+			if ( entry == nullptr ) {
+				error( parser.lexan, 10 ); 
+			}    
+			switch ( entry->token ) {
+				case KONST:
+					error( parser.lexan, 43 );
+				case INTIDENT:
+					typ_left = TYPE_INT;
+					break;
+				case REALIDENT:
+					typ_left = TYPE_REAL;
+					break;
+				case PROC:
+					error( parser.lexan, 20 );
+			}
+
+			parser.next();
+			if ( parser.lookahead != ASS ) {
+				error( parser.lexan, 12 );
+			}
+			parser.next();
+			typ_right = exp( parser );
+
+			if ( typ_left != typ_right ) {
+				error( parser.lexan, 36 );
+			}
+			break;
+		case CALL:
+			parser.next();
+
+			if ( parser.lookahead != ID ) {
+				error( parser.lexan, 4 );
+			}
+
+			st_entry* entry = lookup( parser.lookahead.idname );
+			if ( entry == nullptr ) {
+				error( parser.lexan, 10 ); 
+			}
+			if ( entry->token != PROC ) {
+				error( parser.lexan, 36 );
+			}
+			parser.next();
+			break;
+		case BEGIN:
+			do {
+				parser.next();
+				statement( parser );
+			} while( parser.lookahead == SEMICOLON );
+			
+			if ( parser.lookahead != END ) {
+				error( parser.lexan, 16 );
+			}
+			break;
+		case IF:
+			parser.next();
+			condition( parser );
+
+			if ( parser.lookahead != THEN ) {
+				error( parser.lexan, 15 );
+			}
+			parser.next();
+			statement( parser );
+			
+			switch ( parser.lookahead.type ) {
+				case FI:
+					parser.next();
+					break;
+				case ELSE:
+					parser.next();
+					statement( parser );
+					break;
+				default:
+					error( parser.lexan, 39 );
+			}
+			break;
+		case WHILE:
+			parser.next();
+			condition( parser );
+			if ( parser.lookahead != DO ) {
+				error( parser.lexan, 17 );
+			}
+			statement( parser );
+			break;
+		default:
+			error( parser.lexan, 30 );
+	}
 	TRACE_END();
 }
 
