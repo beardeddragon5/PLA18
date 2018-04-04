@@ -332,6 +332,7 @@ void vardecl( parser_t& parser ) {
 			error(parser.lexan , 42);
 		}
 	}
+	string idname = parser.lookahead.idname;
 	parser.next();
 
 	if(parser.lookahead != COLON){
@@ -339,11 +340,17 @@ void vardecl( parser_t& parser ) {
 	}
 	parser.next();
 
+	symtype_t type = REALIDENT;
 	if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
 		error(parser.lexan , 36);
 	}
-	parser.next();
+	if(parser.lookahead.type == INT){
+		type = INTIDENT;
+	}
 
+	insert(parser.lexan, type , idname,  )
+	parser.next();
+	
 	while(parser.lookahead != SEMICOLON){
 
 		if(parser.lookahead != KOMMA){
@@ -353,7 +360,13 @@ void vardecl( parser_t& parser ) {
 
 		if(parser.lookahead.type != ID){
 			error(parser.lexan , 4);
+		}else{
+			//doppel declaration
+			if(lookup_in_actsym(parser.lookahead.idname)){
+				error(parser.lexan , 42);
+			}
 		}
+		string idname = parser.lookahead.idname;
 		parser.next();
 
 		if(parser.lookahead != COLON){
@@ -361,10 +374,13 @@ void vardecl( parser_t& parser ) {
 		}
 		parser.next();
 
+		symtype_t type = REALIDENT;
 		if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
 			error(parser.lexan , 36);
 		}
-		parser.next();
+		if(parser.lookahead.type == INT){
+			type = INTIDENT;
+		}
 
 	}
 
@@ -390,6 +406,7 @@ void constdecl( parser_t& parser ) {
 	}
 	parser.next();
 
+
 	if(parser.lookahead.type != ID){
 		error(parser.lexan , 4);
 	}else{
@@ -398,6 +415,7 @@ void constdecl( parser_t& parser ) {
 			error(parser.lexan , 42);
 		}
 	}
+	string idname = parser.lookahead.idname;
 	parser.next();
 
 	if(parser.lookahead != EQ){
@@ -408,6 +426,7 @@ void constdecl( parser_t& parser ) {
 	if(parser.lookahead.type != INTNUM){
 		error(parser.lexan , 36);
 	}
+	insert(parser.lexan, KONST, idname,parser.lookahead.num);
 	parser.next();
 
 	while(parser.lookahead != SEMICOLON){
@@ -419,7 +438,13 @@ void constdecl( parser_t& parser ) {
 
 		if(parser.lookahead.type != ID){
 			error(parser.lexan , 4);
+		}else{
+			//doppel declaration
+			if(lookup_in_actsym(parser.lookahead.idname)){
+				error(parser.lexan , 42);
+			}
 		}
+		string idname = parser.lookahead.idname;
 		parser.next();
 
 		if(parser.lookahead != EQ){
@@ -430,6 +455,7 @@ void constdecl( parser_t& parser ) {
 		if(parser.lookahead.type != INTNUM){
 			error(parser.lexan , 36);
 		}
+		insert(parser.lexan, KONST, idname,parser.lookahead.num);
 		parser.next();
 
 	}

@@ -38,6 +38,8 @@
         "map": "cpp",
         "list": "cpp",
         "__tree": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "xmemory0": "cpp",
+        "xtr1common": "cpp"
     }
 }
