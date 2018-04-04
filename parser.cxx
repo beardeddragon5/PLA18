@@ -112,7 +112,7 @@ type_t exp( parser_t& parser ) {
 	// check for multipe term seperated by '+' or '-'
 	while (parser.lookahead == PLUS || parser.lookahead == MINUS ) {
 		parser.next();
-		type_t lefttype = factor( parser );
+		type_t lefttype = term( parser );
 		if ( lefttype == TYPE_REAL ) {
 			out = lefttype;
 		}
@@ -228,6 +228,7 @@ void statement( parser_t& parser ) {
 			if ( parser.lookahead != END ) {
 				error( parser.lexan, 16 );
 			}
+			parser.next();
 			break;
 		case IF:
 			parser.next();
@@ -257,6 +258,7 @@ void statement( parser_t& parser ) {
 			if ( parser.lookahead != DO ) {
 				error( parser.lexan, 17 );
 			}
+			parser.next();
 			statement( parser );
 			break;
 		default:
@@ -348,11 +350,10 @@ void vardecl( parser_t& parser ) {
 		type = INTIDENT;
 	}
 
-	insert(parser.lexan, type , idname,  )
+	insert(parser.lexan, type , idname );
 	parser.next();
 	
 	while(parser.lookahead != SEMICOLON){
-
 		if(parser.lookahead != KOMMA){
 			error(parser.lexan , 5);
 		}
@@ -381,9 +382,13 @@ void vardecl( parser_t& parser ) {
 		if(parser.lookahead.type == INT){
 			type = INTIDENT;
 		}
-
+		insert( parser.lexan, type, idname );
+		parser.next();
 	}
-
+	if ( parser.lookahead == SEMICOLON ) {
+		parser.next();
+	}
+	
   	TRACE_END();
 }
 
@@ -459,8 +464,9 @@ void constdecl( parser_t& parser ) {
 		parser.next();
 
 	}
-
-
+	if ( parser.lookahead == SEMICOLON ) {
+		parser.next();
+	}
   	TRACE_END();
 }
 
@@ -485,15 +491,12 @@ void block( parser_t& parser, symtable* newsym ) {
 
 	if(parser.lookahead == CONST){
 		constdecl( parser );
-		parser.next();
 	}
 
 	if(parser.lookahead == VAR){
 		vardecl( parser );
-		parser.next();
 	}
 	procdecl( parser );
-	parser.next();
 	statement( parser );
 
 	actsym = oldsym;
