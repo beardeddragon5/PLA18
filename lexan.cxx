@@ -308,3 +308,17 @@ std::ostream& operator<<( std::ostream& os, const token_t& symbol ) {
 	}
 	return os;
 }
+
+static int traceLevel = 0;
+void TRACE( lexan_t& lexan, string type ) {
+    if ( tracesw == 1 ) {
+        for ( int i = 0; i < traceLevel; i++ ) {
+            trace << '\t';
+        }
+        traceLevel++;
+        trace << "Zeile: " << lexan.lineno << " " << type << endl;
+    }
+}
+void TRACE_END() {
+    traceLevel--;
+}

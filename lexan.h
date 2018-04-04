@@ -90,20 +90,8 @@ struct lexan_t {
 	char actchar;       /* gelesenes Zeichen */
 };
 
-static int traceLevel = 0;
-static inline void TRACE( lexan_t& lexan, string type ) {
-    if ( tracesw == 1 ) {
-        for ( int i = 0; i < traceLevel; i++ ) {
-            trace << '\t';
-        }
-        traceLevel++;
-        trace << "Zeile: " << lexan.lineno << " " << type << endl;
-    }
-}
-
-static inline void TRACE_END() {
-    traceLevel--;
-}
+void TRACE( lexan_t& lexan, string type );
+void TRACE_END( );
 
 lexan_t* initlexan();                       /* Scanner initialisieren */
 token_t nextsymbol(lexan_t&); 				/* liest nächstes Symbol der Eingabe */	

@@ -296,9 +296,7 @@ void procdecl( parser_t& parser ) {
 			error( parser.lexan, 16 );
 		}
 		parser.next();
-
-		symtable* neusym = create_newsym();
-		block( parser, neusym );
+		block( parser, neu->subsym );
 
 		if ( parser.lookahead != SEMICOLON ) {
 			error( parser.lexan, 5 );
