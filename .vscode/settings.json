@@ -34,6 +34,10 @@
         "memory": "cpp",
         "ratio": "cpp",
         "tuple": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "map": "cpp",
+        "list": "cpp",
+        "__tree": "cpp",
+        "string": "cpp"
     }
 }
