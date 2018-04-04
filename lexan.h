@@ -76,6 +76,9 @@ struct token_t {
     token_t& operator= ( const token_t& symbol );
     bool operator== ( const token_t& b );
     bool operator!= ( const token_t& b );
+    bool operator== ( const tokentype_t& type );
+    bool operator!= ( const tokentype_t& type );
+    
 };
 
 /**

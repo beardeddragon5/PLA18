@@ -41,25 +41,27 @@ type_t factor( parser_t& parser ) {
 			 * identifier must be declared so
 			 * a valid entry in the symbol table must be set
 			 */	
-			st_entry* found = lookup( parser.lookahead.idname );
-			if ( found == nullptr ) {
-				// not found so exit with error
-				error( parser.lexan, 10);
+			{
+				st_entry* found = lookup( parser.lookahead.idname );
+				if ( found == nullptr ) {
+					// not found so exit with error
+					error( parser.lexan, 10);
+				}
+				symtype_t kind = found->token;
+				// check witch kind of token it is
+				switch ( kind ) {
+					case KONST:
+					case INTIDENT:
+						out = TYPE_INT;
+						break;
+					case REALIDENT:
+						out = TYPE_REAL;
+						break;
+					case PROC:
+						// procedures are not allowed
+						error( parser.lexan, 20);
+				}		
 			}
-			symtype_t kind = found->token;
-			// check witch kind of token it is
-			switch ( kind ) {
-				case KONST:
-				case INTIDENT:
-					out = TYPE_INT;
-					break;
-				case REALIDENT:
-					out = TYPE_REAL;
-					break;
-				case PROC:
-					// procedures are not allowed
-					error( parser.lexan, 20);
-			}			
 			break;
 		default:
 			error( parser.lexan, 27);
@@ -86,7 +88,10 @@ type_t term( parser_t& parser ) {
 	// check for multiple factors seperated by '*' or '/'
 	while ( parser.lookahead == MULT || parser.lookahead == DIV ) {
 	  	parser.next();
-		out = factor( parser );
+		type_t lefttype = factor( parser );
+		if ( lefttype == TYPE_REAL ) {
+			out = lefttype;
+		}
 	}
 	TRACE_END();
 	return out;
@@ -176,11 +181,34 @@ void statement( parser_t& parser ) {
  */
 void procdecl( parser_t& parser ) {
 	TRACE( parser, "Procdeklaration");
-	st_entry* neu, *found;          // Zeiger auf ST-Eintrag
+	while ( parser.lookahead == PROCEDURE ) {
+		parser.next();
 
-	symtable* neusym;		// Zeiger auf Symboltabelle
+		if ( parser.lookahead.type != ID ) {
+			error( parser.lexan, 4 );
+		}
 
-	// TODO
+		if ( lookup_in_actsym( parser.lookahead.idname ) != nullptr ) {
+			error( parser.lexan, 34 );
+		}
+
+		st_entry* neu = insert( parser.lexan, PROC, parser.lookahead.idname );
+		
+		parser.next();
+
+		if ( parser.lookahead != SEMICOLON ) {
+			error( parser.lexan, 16 );
+		}
+		parser.next();
+
+		symtable* neusym = create_newsym();
+		block( parser, neusym );
+
+		if ( parser.lookahead != SEMICOLON ) {
+			error( parser.lexan, 5 );
+		}
+		parser.next();
+	}
 	TRACE_END();
 }
 
