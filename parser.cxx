@@ -405,7 +405,7 @@ void constdecl( parser_t& parser ) {
 	}
 	parser.next();
 
-	if(parser.lookahead.type != INT){
+	if(parser.lookahead.type != INTNUM){
 		error(parser.lexan , 36);
 	}
 	parser.next();
@@ -427,7 +427,7 @@ void constdecl( parser_t& parser ) {
 		}
 		parser.next();
 
-		if(parser.lookahead.type != INT){
+		if(parser.lookahead.type != INTNUM){
 			error(parser.lexan , 36);
 		}
 		parser.next();
