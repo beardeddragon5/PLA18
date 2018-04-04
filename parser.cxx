@@ -88,7 +88,10 @@ type_t term( parser_t& parser ) {
 	// check for multiple factors seperated by '*' or '/'
 	while ( parser.lookahead == MULT || parser.lookahead == DIV ) {
 	  	parser.next();
-		out = factor( parser );
+		type_t lefttype = factor( parser );
+		if ( lefttype == TYPE_REAL ) {
+			out = lefttype;
+		}
 	}
 	TRACE_END();
 	return out;
