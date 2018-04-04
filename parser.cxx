@@ -273,7 +273,7 @@ void vardecl( parser_t& parser ) {
 		parser.next();
 
 	}
-	// TODO
+
   	TRACE_END();
 }
 
@@ -288,8 +288,59 @@ void vardecl( parser_t& parser ) {
 void constdecl( parser_t& parser ) {
   	TRACE( parser, "Konstantendeklaration");
 	st_entry *neu, *found;
-	// auf const muss IDENT folgen
-  	// TODO
+
+
+	if(parser.lookahead != CONST){
+		//var erwartet
+		error(parser.lexan , 43);
+	}
+	parser.next();
+
+	if(parser.lookahead.type != ID){
+		error(parser.lexan , 4);
+	}else{
+		//doppel declaration
+		if(lookup_in_actsym(parser.lookahead.idname)){
+			error(parser.lexan , 42);
+		}
+	}
+	parser.next();
+
+	if(parser.lookahead != EQ){
+		error(parser.lexan , 43);
+	}
+	parser.next();
+
+	if(parser.lookahead.type != INT){
+		error(parser.lexan , 36);
+	}
+	parser.next();
+
+	while(parser.lookahead != SEMICOLON){
+
+		if(parser.lookahead != KOMMA){
+			error(parser.lexan , 5);
+		}
+		parser.next();
+
+		if(parser.lookahead.type != ID){
+			error(parser.lexan , 4);
+		}
+		parser.next();
+
+		if(parser.lookahead != EQ){
+			error(parser.lexan , 43);
+		}
+		parser.next();
+
+		if(parser.lookahead.type != INT){
+			error(parser.lexan , 36);
+		}
+		parser.next();
+
+	}
+
+
   	TRACE_END();
 }
 
