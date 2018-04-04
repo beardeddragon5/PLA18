@@ -182,7 +182,7 @@ void procdecl( parser_t& parser ) {
 		parser.next();
 
 		if ( parser.lookahead.type != ID ) {
-			error( parser.lexan, 3 );
+			error( parser.lexan, 4 );
 		}
 
 		if ( lookup_in_actsym( parser.lookahead.idname ) != nullptr ) {
@@ -190,12 +190,13 @@ void procdecl( parser_t& parser ) {
 		}
 
 		st_entry* neu = insert( parser.lexan, PROC, parser.lookahead.idname );
-
+		
 		parser.next();
 
 		if ( parser.lookahead != SEMICOLON ) {
-			error( parser.lexan, 5 );
+			error( parser.lexan, 16 );
 		}
+		parser.next();
 
 		symtable* neusym = create_newsym();
 		block( parser, neusym );
