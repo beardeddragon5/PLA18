@@ -57,6 +57,21 @@ bool token_t::operator!= ( const token_t& b ) {
 }
 
 /**
+ * Check if token.type is equal
+ */
+bool token_t::operator== ( const tokentype_t& type ) {
+    return this->type == type;
+}
+
+/**
+ * Check if token.type is equal
+ */
+bool token_t::operator!= ( const tokentype_t& type ) {
+    return this->type != type;
+}
+
+
+/**
  * Basic assignment operator
  */
 token_t& token_t::operator= ( const token_t& symbol ) {
