@@ -70,65 +70,16 @@ token_t lexan_t::nextsymbol() {
 			this->output << "line: " << this->lineno << endl;
 		} else if ( isdigit(this->actchar) ) {
 			/* found number. regex: [0-9]+\.?[0-9]* 	*/
-			char zahl[BSIZE];
-			int b = 0;
-			bool isReal = false;
 
-			this->output.put( this->actchar );
-			zahl[b++] = this->actchar;
-			this->next();
-			while ( isdigit( this->actchar ) || ( !isReal && this->actchar == '.' ) ) {
-				if ( this->actchar == '.' ) {
-					isReal = true;
-				}
-				zahl[b++] = this->actchar;
-				this->output.put( this->actchar );
-				this->next();
-				if ( b > BSIZE ) {
-					this->error( error::NUMBER_TO_BIG );
-				}
-			}
-			zahl[b] = '\0';
+			// TODO implement me
 
-			if ( isReal ) {
-				double real = strtod( zahl, nullptr );
-				if ( errno == ERANGE && real == HUGE_VAL ) {
-					this->error( error::NUMBER_TO_BIG ); // To big number
-				}  
-				return real;
-			}
-			long val = strtol( zahl, nullptr, 0 );
-			if ( errno == ERANGE && ( val == LONG_MIN || val == LONG_MAX ) ) {
-				this->error( error::NUMBER_TO_BIG ); // To big number
-			}	
-			if ( val > INT32_MAX || val < INT32_MIN ) {
-				this->error( error::NUMBER_TO_BIG ); // To big number
-			}
-			return (int) val;
 		} else if ( isalpha(this->actchar) ) {
 			/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 			 * solange Buchstaben oder Ziffern folgen --> Identifikator 
 			 */
-			string ident;
+			
+			// TODO implement me
 
-			ident += this->actchar;
-			this->output.put( this->actchar );
-
-			while ( isalpha( this->actchar ) ||  isdigit( this->actchar ) ) {
-				this->next();
-				if ( isalpha( this->actchar ) ||  isdigit( this->actchar ) ) {
-					ident += this->actchar;
-					this->output.put( this->actchar );
-				}
-				if ( ident.length() > BSIZE ) {
-					this->error( error::IDENTFIER_TO_BIG );
-				}
-			}
-
-			if ( keywords.count( ident ) == 0 ) {
-				return ident;
-			}
-			return keywords[ ident ];
 		} else {
 			this->output.put(this->actchar);				/* Zeichen in Ausgabedatei */
 			switch( this->actchar) {
@@ -136,83 +87,7 @@ token_t lexan_t::nextsymbol() {
 					this->input.get(this->actchar);
 					return EQ;
 
-				case '<':
-					this->input.get( this->actchar);
-					switch ( this->actchar ) {
-						case '=':
-							this->output.put(this->actchar);
-							this->next();
-							return LE;
-						default:
-							return LT;
-					}
-
-				case '!':
-					this->next();
-					this->output.put( this->actchar );
-					if ( this->actchar != '=' ) {
-						this->error( error::EXPECTED_EQUAL );
-					}
-					this->next();
-					return NE;
-
-				case '>':
-					this->next();
-
-					switch ( this->actchar ) {
-						case '=':
-							this->next();
-							return GE;
-						default:
-							return GT;
-					}
-
-				case ':':
-					this->next();
-					switch ( this->actchar ) {
-						case '=':
-							this->output.put( this->actchar );
-							this->next();
-							return ASS;
-						default:
-							return COLON;
-					}
-
-				case ',':
-					this->next();
-					return KOMMA;
-				
-							case ';':
-					this->next();
-					return SEMICOLON;
-
-				case '+':
-					this->next();
-					return PLUS;
-
-				case '-':
-					this->next();
-					return MINUS;
-
-				case '*':
-					this->next();
-					return MULT;
-
-				case '/':
-					this->next();
-					return DIV;
-
-				case '(':
-					this->next();
-					return KLAUF;
-
-				case ')':
-					this->next();
-					return KLZU;
-
-				case '$':
-					this->next();
-					return PROGEND;
+				// TODO implement other symbols
 
 				default:
 					this->error( error::INVALID_CHARACTER );

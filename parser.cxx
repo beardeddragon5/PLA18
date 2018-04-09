@@ -145,97 +145,7 @@ void parser_t::condition() {
  */
 void parser_t::statement() {
 	trace( "statement" );
-	switch ( lookahead.type ) {
-		case token::ID:
-		{
-			st_entry* entry = lookup( lookahead.idname );
-			if ( entry == nullptr ) {
-				lexan.error( error::IDENTIFIER_NOT_DECLARED ); 
-			}    
-			switch ( entry->token ) {
-				case KONST:
-					lexan.error( error::CONST_READONLY );
-				case INTIDENT:
-				case REALIDENT:
-					break;
-				case PROC:
-					lexan.error( error::PROCEDURE_NOT_ASSINABLE );
-			}
-
-			next();
-			if ( lookahead != token::ASS ) {
-				lexan.error( error::EXPECTED_ASS );
-			}
-			next();
-			exp();
-			break;
-		}
-		case token::CALL:
-		{
-			next();
-			if ( lookahead != token::ID ) {
-				lexan.error( error::EXPECTED_ID );
-			}
-			st_entry* entry = lookup( lookahead.idname );
-			if ( entry == nullptr ) {
-				lexan.error( error::IDENTIFIER_NOT_DECLARED ); 
-			}
-			if ( entry->token != PROC ) {
-				lexan.error( error::EXPECTED_ID );
-			}
-			next();
-			break;
-		}
-		case token::BEGIN:
-			do {
-				next();
-				statement();
-			} while( lookahead == token::SEMICOLON );
-			
-			if ( lookahead != token::END ) {
-				lexan.error( error::EXPECTED_END );
-			}
-			next();
-			break;
-		case token::IF:
-			next();
-			condition();
-
-			if ( lookahead != token::THEN ) {
-				lexan.error( error::EXPECTED_THEN );
-			}
-			next();
-			statement();
-			
-			switch ( lookahead.type ) {
-				case token::FI:
-					next();
-					break;
-				case token::ELSE:
-					next();
-					statement();
-
-					if ( lookahead != token::FI ) {
-						lexan.error( error::EXPECTED_IF );
-					}
-					next();
-					break;
-				default:
-					lexan.error( error::EXPECTED_IF );
-			}
-			break;
-		case token::WHILE:
-			next();
-			condition();
-			if ( lookahead != token::DO ) {
-				lexan.error( error::EXPECTED_DO );
-			}
-			next();
-			statement();
-			break;
-		default:
-			lexan.error( error::NO_STATEMENT );
-	}
+	// TODO implement me 
 	traceend();
 }
 
@@ -249,32 +159,7 @@ void parser_t::statement() {
  */
 void parser_t::procdecl() {
 	trace( "procdecl" );
-	while ( lookahead == token::PROCEDURE ) {
-		next();
-
-		if ( lookahead != token::ID ) {
-			lexan.error( error::EXPECTED_ID );
-		}
-
-		if ( lookup_in_actsym( lookahead.idname ) != nullptr ) {
-			lexan.error( error::IDENTIFIER_ALREADY_DECLARED );
-		}
-
-		st_entry* neu = insert( this, PROC, lookahead.idname );
-		
-		next();
-
-		if ( lookahead != token::SEMICOLON ) {
-			lexan.error( error::EXPECTED_SEMICOLON );
-		}
-		next();
-		block( neu->subsym );
-
-		if ( lookahead != token::SEMICOLON ) {
-			lexan.error( error::EXPECTED_SEMICOLON );
-		}
-		next();
-	}
+	// TODO implement me
 	traceend();
 }
 
@@ -288,48 +173,7 @@ void parser_t::procdecl() {
  */
 void parser_t::vardecl( ) {
 	trace( "vardecl" );
-
-	if ( lookahead != token::VAR ) {
-		lexan.error( error::EXPECTED_VAR );
-	}
-	next();
-
-	bool first = true;
-
-	do {
-		if ( !first ) {
-			if ( lookahead != token::KOMMA ) {
-				lexan.error( error::EXPECTED_KOMMA );
-			}
-			next();
-		}
-		
-		if ( lookahead != token::ID ) {
-			lexan.error( error::EXPECTED_ID );
-		}
-		if ( lookup_in_actsym( lookahead.idname ) != nullptr ) {
-			lexan.error( error::IDENTIFIER_ALREADY_DECLARED );
-		}
-		string idname = lookahead.idname;
-		next();
-
-		if ( lookahead != token::COLON ) {
-			lexan.error( error::EXPECTED_COLON );
-		}
-		next();
-
-		if ( lookahead != token::INT && lookahead != token::REAL ) {
-			lexan.error( error::EXPECTED_TYPE );
-		}
-
-		symtype_t type = lookahead == token::INT ? INTIDENT : REALIDENT; 
-
-		insert(this, type , idname );
-		next();
-
-		first = false;
-	}  while ( lookahead != token::SEMICOLON );
-	next();
+	// TODO implement me
 	traceend();
 }
 
@@ -343,44 +187,7 @@ void parser_t::vardecl( ) {
  */
 void parser_t::constdecl() {
   	trace( "constdecl" );
-
-	if ( lookahead != token::CONST ) {
-		//var erwartet
-		lexan.error( error::EXPECTED_CONST );
-	}
-	next();
-
-	bool first = true;
-
-	do {
-		if ( !first ) {
-			if ( lookahead != token::KOMMA ) {
-				lexan.error( error::EXPECTED_KOMMA );
-			}
-			next();
-		}
-		if ( lookahead.type != token::ID ) {
-			lexan.error( error::EXPECTED_ID );
-		}
-		if ( lookup_in_actsym( lookahead.idname ) != nullptr ) {
-			lexan.error( error::IDENTIFIER_ALREADY_DECLARED );
-		}
-		string idname = lookahead.idname;
-		next();
-
-		if ( lookahead != token::EQ ) {
-			lexan.error( error::EXPECTED_EQ );
-		}
-		next();
-
-		if ( lookahead != token::INTNUM ) {
-			lexan.error( error::EXPECTED_INTNUM );
-		}
-		insert( this, KONST, idname, lookahead.num );
-		next();
-		first = false;
-	} while( lookahead != token::SEMICOLON );
-	next();
+	// TODO implement me
   	traceend();
 }
 
@@ -398,23 +205,7 @@ void parser_t::constdecl() {
  */
 void parser_t::block( symtable* newsym ) {
 	trace( "block" );
-
-	// actsym auf neue Symboltabelle setzen
-	symtable* oldsym = actsym;
-	actsym = newsym;
-
-	if ( lookahead == token::CONST ) {
-		constdecl();
-	}
-
-	if ( lookahead == token::VAR ) {
-		vardecl();
-	}
-	procdecl();
-	statement();
-
-	actsym = oldsym;
-
+	// TODO implement me
 	traceend();
 }
 
