@@ -2,9 +2,7 @@
 #include "global.h"
 #endif
 
-#ifndef LEXAN_H
-#include "lexan.h"
-#endif
+struct parser_t;
 
 #ifndef SYMBOL_H
 #define SYMBOL_H
@@ -45,7 +43,7 @@ extern symtable *actsym,		/* Zeiger auf aktuelle Symboltabelle */
 symtable * create_newsym() ;		/* Neue ST erzeugen */
 st_entry * lookup( string s);		/* Namen in ganzer Symboltabelle suchen */
 st_entry * lookup_in_actsym ( string s);	/* Namen in aktueller Symboltabelle suchen */
-st_entry * insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr = 0 );   			/* Neuen Eintrag in actsym erzeugen */
+st_entry * insert( parser_t* parser, symtype_t tok, string name, int wertaddr = 0 );   			/* Neuen Eintrag in actsym erzeugen */
 
 // void generate(int);					/* Codeerzeugung */
-void printsymtab(symtable *);		/* Ausgabe der Symboltabelle */
+void printsymtab( parser_t& parser, symtable *);		/* Ausgabe der Symboltabelle */

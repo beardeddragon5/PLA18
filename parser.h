@@ -16,36 +16,46 @@
 #endif
 
 
-
 struct parser_t {
-    parser_t( lexan_t& lexan ) : lexan( lexan ) {
-        lookahead = nextsymbol( lexan );
+    parser_t( lexan_t& lexan, ostream& fsym, ostream& trace ) : 
+        lexan( lexan ),
+        fsym( fsym ),
+        _trace( trace ) {
+        this->next();
     }
 
     lexan_t& lexan;
     token_t lookahead;
 
+    int traceLevel;
+
+    ostream& fsym;
+    ostream& _trace;
+
     void next() {
-        lookahead = nextsymbol( lexan );
+        lookahead = lexan.nextsymbol();
     }
+
+    void trace( string info ) {
+        for ( int i = 0; i < traceLevel; i++ ) {
+            _trace << '\t';
+        }
+        traceLevel++;
+        _trace << "Zeile[" << lexan.lineno << "]: " << info << endl;
+    }
+
+    void traceend() {
+        traceLevel--;
+    }
+    
+    void constdecl();
+    void vardecl();
+    void procdecl();
+    void factor();
+    void term();
+    void exp();
+    void condition();
+    void statement();
+    void program();
+    void block( symtable* neusym );
 };
-
-static inline void TRACE( parser_t& parser, string type ) {
-    TRACE( parser.lexan, type );
-}
-
-enum type_t {
-    TYPE_REAL,
-    TYPE_INT
-};
-
-void constdecl( parser_t& parser );					/* Verarbeiten einer Konstantendeklaration */
-void vardecl( parser_t& parser ); 					/* Verarbeiten einer VAriablendeklaration */
-void procdecl( parser_t& parser ); 					/* Verarbeiten einer Prozedurdeklaration */
-type_t factor( parser_t& parser ); 						/* Verarbeiten eines Faktors */
-type_t term( parser_t& parser );								/* Verarbeiten eines Terms */
-type_t exp( parser_t& parser ); 								/* Verarbeiten eines Ausdrucks */
-void condition( parser_t& parser ); 					/* Verarbeiten einer Bedingung */
-void statement( parser_t& parser );					/* Verarbeiten Statement */
-void program( parser_t& parser ); 					/* Programm übersetzen */
-void block( parser_t& parser, symtable* neusym);		/* Bearbeiten eines Blockes */

@@ -8,13 +8,13 @@
  * default values for special values if tokentype is
  * INTNUM, REALNUM or iD
  */
-token_t::token_t( tokentype_t type ) : type( type ), idname( "" ) {
+token_t::token_t( token::type_t type ) : type( type ), idname( "" ) {
     switch ( type ) {
         default:
-        case INTNUM:
+        case token::INTNUM:
             num = 0;
             break;
-        case REALNUM:
+        case token::REALNUM:
             realnum = 0.0;
             break;
     }
@@ -38,11 +38,11 @@ bool token_t::operator== ( const token_t& b ) {
         return false;
     }
     switch ( this->type ) {
-        case INTNUM:
+        case token::INTNUM:
             return this->num == b.num;
-        case REALNUM:
+        case token::REALNUM:
             return this->realnum == b.realnum;
-        case ID:
+        case token::ID:
             return this->idname == b.idname;
         default:
             return true;
@@ -59,14 +59,14 @@ bool token_t::operator!= ( const token_t& b ) {
 /**
  * Check if token.type is equal
  */
-bool token_t::operator== ( const tokentype_t& type ) {
+bool token_t::operator== ( const token::type_t& type ) {
     return this->type == type;
 }
 
 /**
  * Check if token.type is equal
  */
-bool token_t::operator!= ( const tokentype_t& type ) {
+bool token_t::operator!= ( const token::type_t& type ) {
     return this->type != type;
 }
 
@@ -77,13 +77,13 @@ bool token_t::operator!= ( const tokentype_t& type ) {
 token_t& token_t::operator= ( const token_t& symbol ) {
     this->type = symbol.type;
     switch ( this->type ) {
-        case INTNUM:
+        case token::INTNUM:
             this->num = symbol.num;
             break;
-        case REALNUM:
+        case token::REALNUM:
             this->realnum = symbol.realnum;
             break;
-        case ID:
+        case token::ID:
             this->idname = symbol.idname;
             break;
         default:

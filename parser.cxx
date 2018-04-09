@@ -14,61 +14,53 @@
  * ne next symbol must be in set in parser and will set the next symbol to parser
  * @return type of the factor returned
  */
-type_t factor( parser_t& parser ) {
-	TRACE( parser, "Faktor" );
-	type_t out;
+void parser_t::factor(  ) {
+	trace( "Faktor" );
 
 	// je nach nächstem Eingabesymbol in lookahead
-	switch( parser.lookahead.type ) {
-		case KLAUF:	// found '('
-			parser.next();
-			out = exp( parser );
+	switch( lookahead.type ) {
+		case token::KLAUF:	// found '('
+			next();
+			this->exp();
 
-			if ( parser.lookahead != KLZU ) {
-				error( parser.lexan, 27 ); // no factor
+			if ( lookahead != token::KLZU ) {
+				lexan.error( error::NO_FACTOR ); // no factor
 			}
 			break;
 
-		case INTNUM: // found int constant
-			out = TYPE_INT;
-			break;
-		case REALNUM: // found real constant
-			out = TYPE_REAL;
+		case token::INTNUM: // found int constant
+		case token::REALNUM: // found real constant
 			break;
 
-		case ID: // found identifier 
+		case token::ID: // found identifier 
 			/**
 			 * identifier must be declared so
 			 * a valid entry in the symbol table must be set
 			 */	
 			{
-				st_entry* found = lookup( parser.lookahead.idname );
+				st_entry* found = lookup( lookahead.idname );
 				if ( found == nullptr ) {
 					// not found so exit with error
-					error( parser.lexan, 10);
+					lexan.error( error::IDENTIFIER_NOT_DECLARED );
 				}
 				symtype_t kind = found->token;
 				// check witch kind of token it is
 				switch ( kind ) {
 					case KONST:
 					case INTIDENT:
-						out = TYPE_INT;
-						break;
 					case REALIDENT:
-						out = TYPE_REAL;
 						break;
 					case PROC:
 						// procedures are not allowed
-						error( parser.lexan, 20);
+						lexan.error( error::PROCDURE_IN_EXPRESSION_NOT_ALLOWED );
 				}		
 			}
 			break;
 		default:
-			error( parser.lexan, 27);
+			lexan.error( error::NO_FACTOR );
 	}
-	parser.next();
-	TRACE_END();
-	return out;
+	next();
+	traceend();
 }
 
 /**
@@ -78,23 +70,18 @@ type_t factor( parser_t& parser ) {
  * ne next symbol must be in set in parser and will set the next symbol to parser
  * @return type of term
  */
-type_t term( parser_t& parser ) {
-	TRACE( parser, "Term" );
-
-	type_t out = factor( parser );
+void parser_t::term( ) {
+	trace( "term" );
+	factor();
 
 	// TODO: witch type ( implicit typecast ??? )
 
 	// check for multiple factors seperated by '*' or '/'
-	while ( parser.lookahead == MULT || parser.lookahead == DIV ) {
-	  	parser.next();
-		type_t lefttype = factor( parser );
-		if ( lefttype == TYPE_REAL ) {
-			out = lefttype;
-		}
+	while ( lookahead == token::MULT || lookahead == token::DIV ) {
+	  	next();
+		factor();
 	}
-	TRACE_END();
-	return out;
+	traceend();
 }
 
 /**
@@ -104,21 +91,17 @@ type_t term( parser_t& parser ) {
  * ne next symbol must be in set in parser and will set the next symbol to parser
  * @return type of the expression
  */
-type_t exp( parser_t& parser ) {
-	TRACE( parser, "Ausdruck" );
+void parser_t::exp() {
+	trace( "expression" );
 
-	type_t out = term( parser );
+	term();
 	// TODO: witch type ( implicit typecast ??? )
 	// check for multipe term seperated by '+' or '-'
-	while (parser.lookahead == PLUS || parser.lookahead == MINUS ) {
-		parser.next();
-		type_t lefttype = term( parser );
-		if ( lefttype == TYPE_REAL ) {
-			out = lefttype;
-		}
+	while ( lookahead == token::PLUS || lookahead == token::MINUS ) {
+		next();
+		term();
 	}
-	TRACE_END();
-	return out;
+	traceend();
 }
 
 /**
@@ -127,31 +110,27 @@ type_t exp( parser_t& parser ) {
  * 
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
-void condition( parser_t& parser ) {
-	TRACE( parser, "Condition");
-	type_t left, right;
+void parser_t::condition() {
+	trace( "condition" );
 
-	left = exp( parser );
+	exp();
 	// after expression there must be a relop 
-	switch( parser.lookahead.type ) {
-		case EQ:
-		case NE:
-		case LT:
-		case LE:
-		case GT:
-		case GE:
-			parser.next();
-			right = exp( parser );
+	switch( lookahead.type ) {
+		case token::EQ:
+		case token::NE:
+		case token::LT:
+		case token::LE:
+		case token::GT:
+		case token::GE:
+			next();
+			exp();
 			break;
 
 		default: // kein relationaler Operator
-			error( parser.lexan, 19);
+			lexan.error( error::EXPECTED_RATIONAL_OPERATOR );
 			break;
 	}
-	if ( left != right ) {
-		errortext( parser.lexan, "Typen der Operanden nicht kompatibel");
-	}
-	TRACE_END();
+	traceend();
 }
 
 /**
@@ -164,112 +143,100 @@ void condition( parser_t& parser ) {
  * 
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
-void statement( parser_t& parser ) {
-	TRACE( parser, "Statement");
-	st_entry *found;		// Zeiger auf ST-Eintrag
-	int typ_left, typ_right;
-
-	switch ( parser.lookahead.type ) {
-		case ID:
+void parser_t::statement() {
+	trace( "statement" );
+	switch ( lookahead.type ) {
+		case token::ID:
 		{
-			st_entry* entry = lookup( parser.lookahead.idname );
+			st_entry* entry = lookup( lookahead.idname );
 			if ( entry == nullptr ) {
-				error( parser.lexan, 10 ); 
+				lexan.error( error::IDENTIFIER_NOT_DECLARED ); 
 			}    
 			switch ( entry->token ) {
 				case KONST:
-					error( parser.lexan, 43 );
+					lexan.error( error::CONST_READONLY );
 				case INTIDENT:
-					typ_left = TYPE_INT;
-					break;
 				case REALIDENT:
-					typ_left = TYPE_REAL;
 					break;
 				case PROC:
-					error( parser.lexan, 20 );
+					lexan.error( error::PROCEDURE_NOT_ASSINABLE );
 			}
 
-			parser.next();
-			if ( parser.lookahead != ASS ) {
-				error( parser.lexan, 12 );
+			next();
+			if ( lookahead != token::ASS ) {
+				lexan.error( error::EXPECTED_ASS );
 			}
-			parser.next();
-			typ_right = exp( parser );
-
-			if ( typ_left != typ_right ) {
-				error( parser.lexan, 36 );
-			}
+			next();
+			exp();
 			break;
 		}
-		case CALL:
+		case token::CALL:
 		{
-			parser.next();
-
-			if ( parser.lookahead != ID ) {
-				error( parser.lexan, 4 );
+			next();
+			if ( lookahead != token::ID ) {
+				lexan.error( error::EXPECTED_ID );
 			}
-
-			st_entry* entry = lookup( parser.lookahead.idname );
+			st_entry* entry = lookup( lookahead.idname );
 			if ( entry == nullptr ) {
-				error( parser.lexan, 10 ); 
+				lexan.error( error::IDENTIFIER_NOT_DECLARED ); 
 			}
 			if ( entry->token != PROC ) {
-				error( parser.lexan, 36 );
+				lexan.error( error::EXPECTED_ID );
 			}
-			parser.next();
+			next();
 			break;
 		}
-		case BEGIN:
+		case token::BEGIN:
 			do {
-				parser.next();
-				statement( parser );
-			} while( parser.lookahead == SEMICOLON );
+				next();
+				statement();
+			} while( lookahead == token::SEMICOLON );
 			
-			if ( parser.lookahead != END ) {
-				error( parser.lexan, 16 );
+			if ( lookahead != token::END ) {
+				lexan.error( error::EXPECTED_END );
 			}
-			parser.next();
+			next();
 			break;
-		case IF:
-			parser.next();
-			condition( parser );
+		case token::IF:
+			next();
+			condition();
 
-			if ( parser.lookahead != THEN ) {
-				error( parser.lexan, 15 );
+			if ( lookahead != token::THEN ) {
+				lexan.error( error::EXPECTED_THEN );
 			}
-			parser.next();
-			statement( parser );
+			next();
+			statement();
 			
-			switch ( parser.lookahead.type ) {
-				case FI:
-					parser.next();
+			switch ( lookahead.type ) {
+				case token::FI:
+					next();
 					break;
-				case ELSE:
-					parser.next();
-					statement( parser );
+				case token::ELSE:
+					next();
+					statement();
 
-					if ( parser.lookahead != FI ) {
-						error( parser.lexan, 39 );
+					if ( lookahead != token::FI ) {
+						lexan.error( error::EXPECTED_IF );
 					}
-					parser.next();
+					next();
 					break;
 				default:
-					error( parser.lexan, 39 );
+					lexan.error( error::EXPECTED_IF );
 			}
 			break;
-		case WHILE:
-			parser.next();
-			condition( parser );
-			if ( parser.lookahead != DO ) {
-				error( parser.lexan, 17 );
+		case token::WHILE:
+			next();
+			condition();
+			if ( lookahead != token::DO ) {
+				lexan.error( error::EXPECTED_DO );
 			}
-			parser.next();
-			statement( parser );
+			next();
+			statement();
 			break;
 		default:
-			error( parser.lexan, 30 );
+			lexan.error( error::NO_STATEMENT );
 	}
-	TRACE_END();
+	traceend();
 }
 
 /**
@@ -280,35 +247,35 @@ void statement( parser_t& parser ) {
  * 
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
-void procdecl( parser_t& parser ) {
-	TRACE( parser, "Procdeklaration");
-	while ( parser.lookahead == PROCEDURE ) {
-		parser.next();
+void parser_t::procdecl() {
+	trace( "procdecl" );
+	while ( lookahead == token::PROCEDURE ) {
+		next();
 
-		if ( parser.lookahead.type != ID ) {
-			error( parser.lexan, 4 );
+		if ( lookahead != token::ID ) {
+			lexan.error( error::EXPECTED_ID );
 		}
 
-		if ( lookup_in_actsym( parser.lookahead.idname ) != nullptr ) {
-			error( parser.lexan, 34 );
+		if ( lookup_in_actsym( lookahead.idname ) != nullptr ) {
+			lexan.error( error::IDENTIFIER_ALREADY_DECLARED );
 		}
 
-		st_entry* neu = insert( parser.lexan, PROC, parser.lookahead.idname );
+		st_entry* neu = insert( this, PROC, lookahead.idname );
 		
-		parser.next();
+		next();
 
-		if ( parser.lookahead != SEMICOLON ) {
-			error( parser.lexan, 16 );
+		if ( lookahead != token::SEMICOLON ) {
+			lexan.error( error::EXPECTED_SEMICOLON );
 		}
-		parser.next();
-		block( parser, neu->subsym );
+		next();
+		block( neu->subsym );
 
-		if ( parser.lookahead != SEMICOLON ) {
-			error( parser.lexan, 5 );
+		if ( lookahead != token::SEMICOLON ) {
+			lexan.error( error::EXPECTED_SEMICOLON );
 		}
-		parser.next();
+		next();
 	}
-	TRACE_END();
+	traceend();
 }
 
 /**
@@ -319,80 +286,51 @@ void procdecl( parser_t& parser ) {
  * 
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
-void vardecl( parser_t& parser ) {
-	TRACE( parser, "Variablendeklaration");
-  	st_entry* neu, *found;
-	
-	if(parser.lookahead != VAR){
-		//var erwartet
-		error(parser.lexan , 40);
-	}
-	parser.next();
+void parser_t::vardecl( ) {
+	trace( "vardecl" );
 
-	if(parser.lookahead.type != ID){
-		error(parser.lexan , 4);
-	}else{
-		//doppel declaration
-		if(lookup_in_actsym(parser.lookahead.idname)){
-			error(parser.lexan , 42);
-		}
+	if ( lookahead != token::VAR ) {
+		lexan.error( error::EXPECTED_VAR );
 	}
-	string idname = parser.lookahead.idname;
-	parser.next();
+	next();
 
-	if(parser.lookahead != COLON){
-		error(parser.lexan , 41);
-	}
-	parser.next();
+	bool first = true;
 
-	symtype_t type = REALIDENT;
-	if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
-		error(parser.lexan , 36);
-	}
-	if(parser.lookahead.type == INT){
-		type = INTIDENT;
-	}
-
-	insert(parser.lexan, type , idname );
-	parser.next();
-	
-	while(parser.lookahead != SEMICOLON){
-		if(parser.lookahead != KOMMA){
-			error(parser.lexan , 5);
-		}
-		parser.next();
-
-		if(parser.lookahead.type != ID){
-			error(parser.lexan , 4);
-		}else{
-			//doppel declaration
-			if(lookup_in_actsym(parser.lookahead.idname)){
-				error(parser.lexan , 42);
+	do {
+		if ( !first ) {
+			if ( lookahead != token::KOMMA ) {
+				lexan.error( error::EXPECTED_KOMMA );
 			}
+			next();
 		}
-		string idname = parser.lookahead.idname;
-		parser.next();
+		
+		if ( lookahead != token::ID ) {
+			lexan.error( error::EXPECTED_ID );
+		}
+		if ( lookup_in_actsym( lookahead.idname ) != nullptr ) {
+			lexan.error( error::IDENTIFIER_ALREADY_DECLARED );
+		}
+		string idname = lookahead.idname;
+		next();
 
-		if(parser.lookahead != COLON){
-			error(parser.lexan , 41);
+		if ( lookahead != token::COLON ) {
+			lexan.error( error::EXPECTED_COLON );
 		}
-		parser.next();
+		next();
 
-		symtype_t type = REALIDENT;
-		if(parser.lookahead.type != INT && parser.lookahead.type != REAL){
-			error(parser.lexan , 36);
+		if ( lookahead != token::INT && lookahead != token::REAL ) {
+			lexan.error( error::EXPECTED_TYPE );
 		}
-		if(parser.lookahead.type == INT){
-			type = INTIDENT;
-		}
-		insert( parser.lexan, type, idname );
-		parser.next();
-	}
-	if ( parser.lookahead == SEMICOLON ) {
-		parser.next();
-	}
-	
-  	TRACE_END();
+
+		symtype_t type = lookahead == token::INT ? INTIDENT : REALIDENT; 
+
+		insert(this, type , idname );
+		next();
+
+		first = false;
+	}  while ( lookahead != token::SEMICOLON );
+	next();
+	traceend();
 }
 
 /**
@@ -403,74 +341,47 @@ void vardecl( parser_t& parser ) {
  * 
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
-void constdecl( parser_t& parser ) {
-  	TRACE( parser, "Konstantendeklaration");
-	st_entry *neu, *found;
+void parser_t::constdecl() {
+  	trace( "constdecl" );
 
-
-	if(parser.lookahead != CONST){
+	if ( lookahead != token::CONST ) {
 		//var erwartet
-		error(parser.lexan , 43);
+		lexan.error( error::EXPECTED_CONST );
 	}
-	parser.next();
+	next();
 
+	bool first = true;
 
-	if(parser.lookahead.type != ID){
-		error(parser.lexan , 4);
-	}else{
-		//doppel declaration
-		if(lookup_in_actsym(parser.lookahead.idname)){
-			error(parser.lexan , 42);
-		}
-	}
-	string idname = parser.lookahead.idname;
-	parser.next();
-
-	if(parser.lookahead != EQ){
-		error(parser.lexan , 43);
-	}
-	parser.next();
-
-	if(parser.lookahead.type != INTNUM){
-		error(parser.lexan , 36);
-	}
-	insert(parser.lexan, KONST, idname,parser.lookahead.num);
-	parser.next();
-
-	while(parser.lookahead != SEMICOLON){
-
-		if(parser.lookahead != KOMMA){
-			error(parser.lexan , 5);
-		}
-		parser.next();
-
-		if(parser.lookahead.type != ID){
-			error(parser.lexan , 4);
-		}else{
-			//doppel declaration
-			if(lookup_in_actsym(parser.lookahead.idname)){
-				error(parser.lexan , 42);
+	do {
+		if ( !first ) {
+			if ( lookahead != token::KOMMA ) {
+				lexan.error( error::EXPECTED_KOMMA );
 			}
+			next();
 		}
-		string idname = parser.lookahead.idname;
-		parser.next();
-
-		if(parser.lookahead != EQ){
-			error(parser.lexan , 43);
+		if ( lookahead.type != token::ID ) {
+			lexan.error( error::EXPECTED_ID );
 		}
-		parser.next();
-
-		if(parser.lookahead.type != INTNUM){
-			error(parser.lexan , 36);
+		if ( lookup_in_actsym( lookahead.idname ) != nullptr ) {
+			lexan.error( error::IDENTIFIER_ALREADY_DECLARED );
 		}
-		insert(parser.lexan, KONST, idname,parser.lookahead.num);
-		parser.next();
+		string idname = lookahead.idname;
+		next();
 
-	}
-	if ( parser.lookahead == SEMICOLON ) {
-		parser.next();
-	}
-  	TRACE_END();
+		if ( lookahead != token::EQ ) {
+			lexan.error( error::EXPECTED_EQ );
+		}
+		next();
+
+		if ( lookahead != token::INTNUM ) {
+			lexan.error( error::EXPECTED_INTNUM );
+		}
+		insert( this, KONST, idname, lookahead.num );
+		next();
+		first = false;
+	} while( lookahead != token::SEMICOLON );
+	next();
+  	traceend();
 }
 
 /**
@@ -485,26 +396,26 @@ void constdecl( parser_t& parser ) {
  *   is the new symbolic table. This can ether be the global table or the local table of a procedur
  * 
  */
-void block( parser_t& parser, symtable* newsym ) {
-	TRACE( parser, "Block");
+void parser_t::block( symtable* newsym ) {
+	trace( "block" );
 
 	// actsym auf neue Symboltabelle setzen
 	symtable* oldsym = actsym;
 	actsym = newsym;
 
-	if(parser.lookahead == CONST){
-		constdecl( parser );
+	if ( lookahead == token::CONST ) {
+		constdecl();
 	}
 
-	if(parser.lookahead == VAR){
-		vardecl( parser );
+	if ( lookahead == token::VAR ) {
+		vardecl();
 	}
-	procdecl( parser );
-	statement( parser );
+	procdecl();
+	statement();
 
 	actsym = oldsym;
 
-	TRACE_END();
+	traceend();
 }
 
 /**
@@ -513,25 +424,24 @@ void block( parser_t& parser, symtable* newsym ) {
  * 
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
-void program( parser_t& parser ) {
-	TRACE( parser, "Programm" );
+void parser_t::program() {
+	trace( "programm" );
 
 	// globale Symboltabelle  anlegen (firstsym
 	firstsym = create_newsym();
 
 	// Block muss folgen
-	block( parser, firstsym );
+	block( firstsym );
 
 	//  nach Block muss '$' folgen
-	if (parser.lookahead == PROGEND)
-		// nächstes Symbol lesen
-		parser.next();
-	else
-		// korrektes Programmende fehlt
-		error( parser.lexan, 31 );
+	if ( lookahead != token::PROGEND ) {
+		lexan.error( error::EXPECTED_PROGEND );
+	}
+	next();
 
 	// Dateiende erreicht ?
-	if (parser.lookahead != DONE)
-		error( parser.lexan, 33 ); // noch Symbole in Eingabedatei nach RPOGRAM
-	TRACE_END();
+	if ( lookahead != token::DONE ) {
+		lexan.error( error::EXPECTED_DONE );
+	}
+	traceend();
 }

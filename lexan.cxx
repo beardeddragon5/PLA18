@@ -16,19 +16,12 @@
 
 #include <climits>
 #include <cmath>
+#include <map>
 
-/**
- * keyword_t is a struct mapping a keyword name used in pla18
- * to a tokentype used by the compiler
- */
-struct keyword_t {
-  string name;			
-  tokentype_t token;							
-};
+using namespace token;
 
-/* Tabelle reservierter Worte */
-struct keyword_t keywords [] = {
-  	{ "const", 		CONST		},
+map<string, type_t> keywords = {
+	{ "const", 		CONST		},
 	{ "var", 		VAR			},
 	{ "procedure", 	PROCEDURE	},
 	{ "call", 		CALL		},
@@ -44,33 +37,17 @@ struct keyword_t keywords [] = {
 	{ "fi", 		FI			}
 };
 
-/**
- * lookforKeyword looks if given key is a reserved keyword in pla.
- * 
- * This is used to check if a read string is a identifier or a keyword.
- * 
- * @param key string to look for
- * @return token of reserved keyword or INVALID 
- */
-tokentype_t lookforKeyword( string key ) {
-	int length = sizeof(keywords) / sizeof(keyword_t); 
-	for ( int i = 0; i < length; i++ ) {
-		if ( keywords[i].name == key ) {
-			return keywords[i].token;
-		}
-	}
-	return INVALID;
-}
-
 /** 
  * Initalize a new lexan_t entity starting at line number 1 and reading the
- * first character from fin
+ * first character from this->input
  */
-lexan_t* initlexan() {
-	lexan_t* lex = (lexan_t*) malloc( sizeof(lexan_t) );
-	lex->lineno = 1;
-	fin.get( lex->actchar );
-	return lex;
+lexan_t::lexan_t( ifstream& input, ostream& output, ostream& error )
+	: lineno( 1 ), input( input ), output( output ), err( error ) {
+	this->next();
+}
+
+void lexan_t::next() {
+	this->input.get( this->actchar );
 }
 
 /**
@@ -81,34 +58,34 @@ lexan_t* initlexan() {
  * @param lex the used lexan instance with the current character and linenumber
  * @return the found symbol
  */
-token_t nextsymbol(lexan_t& lex) {
-	while( !fin.eof() ) {
-		if ( isspace( lex.actchar ) && lex.actchar != '\n' ) {
+token_t lexan_t::nextsymbol() {
+	while( !this->input.eof() ) {
+		if ( isspace( this->actchar ) && this->actchar != '\n' ) {
 			/* ignore whitespaces except for the newline */
-			fin.get(lex.actchar);
-		} else if ( lex.actchar == '\n' ) {
+			this->input.get(this->actchar);
+		} else if ( this->actchar == '\n' ) {
 			/* found newline => increment linenumber of lexan_t */
-			fin.get(lex.actchar);
-			lex.lineno++;
-			fout << "line: " << lex.lineno << endl;
-		} else if ( isdigit(lex.actchar) ) {
+			this->input.get(this->actchar);
+			this->lineno++;
+			this->output << "line: " << this->lineno << endl;
+		} else if ( isdigit(this->actchar) ) {
 			/* found number. regex: [0-9]+\.?[0-9]* 	*/
 			char zahl[BSIZE];
 			int b = 0;
 			bool isReal = false;
 
-			fout.put( lex.actchar );
-			zahl[b++] = lex.actchar;
-			fin.get( lex.actchar );
-			while ( isdigit( lex.actchar ) || ( !isReal && lex.actchar == '.' ) ) {
-				if ( lex.actchar == '.' ) {
+			this->output.put( this->actchar );
+			zahl[b++] = this->actchar;
+			this->next();
+			while ( isdigit( this->actchar ) || ( !isReal && this->actchar == '.' ) ) {
+				if ( this->actchar == '.' ) {
 					isReal = true;
 				}
-				zahl[b++] = lex.actchar;
-				fout.put( lex.actchar );
-				fin.get( lex.actchar );
+				zahl[b++] = this->actchar;
+				this->output.put( this->actchar );
+				this->next();
 				if ( b > BSIZE ) {
-					error( lex, 24 );
+					this->error( error::NUMBER_TO_BIG );
 				}
 			}
 			zahl[b] = '\0';
@@ -116,130 +93,129 @@ token_t nextsymbol(lexan_t& lex) {
 			if ( isReal ) {
 				double real = strtod( zahl, nullptr );
 				if ( errno == ERANGE && real == HUGE_VAL ) {
-					error(lex, 24); // To big number
+					this->error( error::NUMBER_TO_BIG ); // To big number
 				}  
 				return real;
 			}
 			long val = strtol( zahl, nullptr, 0 );
 			if ( errno == ERANGE && ( val == LONG_MIN || val == LONG_MAX ) ) {
-				error(lex, 24); // To big number
+				this->error( error::NUMBER_TO_BIG ); // To big number
 			}	
 			if ( val > INT32_MAX || val < INT32_MIN ) {
-				error(lex, 24); // To big number
+				this->error( error::NUMBER_TO_BIG ); // To big number
 			}
 			return (int) val;
-		} else if ( isalpha(lex.actchar) ) {
+		} else if ( isalpha(this->actchar) ) {
 			/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 			 * solange Buchstaben oder Ziffern folgen --> Identifikator 
 			 */
 			string ident;
 
-			ident += lex.actchar;
-			fout.put( lex.actchar );
+			ident += this->actchar;
+			this->output.put( this->actchar );
 
-			while ( isalpha( lex.actchar ) ||  isdigit( lex.actchar ) ) {
-				fin.get( lex.actchar );
-				if ( isalpha( lex.actchar ) ||  isdigit( lex.actchar ) ) {
-					ident += lex.actchar;
-					fout.put( lex.actchar );
+			while ( isalpha( this->actchar ) ||  isdigit( this->actchar ) ) {
+				this->next();
+				if ( isalpha( this->actchar ) ||  isdigit( this->actchar ) ) {
+					ident += this->actchar;
+					this->output.put( this->actchar );
 				}
 				if ( ident.length() > BSIZE ) {
-					error( lex, 32 );
+					this->error( error::IDENTFIER_TO_BIG );
 				}
 			}
 
-			tokentype_t type = lookforKeyword( ident );
-			if ( type != INVALID ) {
-				return type;
+			if ( keywords.count( ident ) == 0 ) {
+				return ident;
 			}
-			return ident;
+			return keywords[ ident ];
 		} else {
-			fout.put(lex.actchar);				/* Zeichen in Ausgabedatei */
-			switch( lex.actchar) {
+			this->output.put(this->actchar);				/* Zeichen in Ausgabedatei */
+			switch( this->actchar) {
 				case '=':
-					fin.get(lex.actchar);
+					this->input.get(this->actchar);
 					return EQ;
 
 				case '<':
-					fin.get(lex.actchar);
-					switch ( lex.actchar ) {
+					this->input.get( this->actchar);
+					switch ( this->actchar ) {
 						case '=':
-							fout.put(lex.actchar);
-							fin.get( lex.actchar );
+							this->output.put(this->actchar);
+							this->next();
 							return LE;
 						default:
 							return LT;
 					}
 
 				case '!':
-					fin.get( lex.actchar );
-					fout.put( lex.actchar );
-					if ( lex.actchar != '=' ) {
-						error( lex, 32 );
+					this->next();
+					this->output.put( this->actchar );
+					if ( this->actchar != '=' ) {
+						this->error( error::EXPECTED_EQUAL );
 					}
-					fin.get( lex.actchar );
+					this->next();
 					return NE;
 
 				case '>':
-					fin.get( lex.actchar );
+					this->next();
 
-					switch ( lex.actchar ) {
+					switch ( this->actchar ) {
 						case '=':
-							fin.get( lex.actchar );
+							this->next();
 							return GE;
 						default:
 							return GT;
 					}
 
 				case ':':
-					fin.get( lex.actchar );
-					switch ( lex.actchar ) {
+					this->next();
+					switch ( this->actchar ) {
 						case '=':
-							fout.put( lex.actchar );
-							fin.get( lex.actchar );
+							this->output.put( this->actchar );
+							this->next();
 							return ASS;
 						default:
 							return COLON;
 					}
 
 				case ',':
-					fin.get( lex.actchar );
+					this->next();
 					return KOMMA;
 				
 							case ';':
-					fin.get( lex.actchar );
+					this->next();
 					return SEMICOLON;
 
 				case '+':
-					fin.get( lex.actchar );
+					this->next();
 					return PLUS;
 
 				case '-':
-					fin.get( lex.actchar );
+					this->next();
 					return MINUS;
 
 				case '*':
-					fin.get( lex.actchar );
+					this->next();
 					return MULT;
 
 				case '/':
-					fin.get( lex.actchar );
+					this->next();
 					return DIV;
 
 				case '(':
-					fin.get( lex.actchar );
+					this->next();
 					return KLAUF;
 
 				case ')':
-					fin.get( lex.actchar );
+					this->next();
 					return KLZU;
 
 				case '$':
-					fin.get( lex.actchar );
+					this->next();
 					return PROGEND;
 
 				default:
-					error(lex, 32);
+					this->error( error::INVALID_CHARACTER );
 					break;
 			} /* end-switch */
 		} /* end-else */
@@ -247,50 +223,52 @@ token_t nextsymbol(lexan_t& lex) {
  	return DONE; 	/* EIngabe -Ende erreicht */
 }
 
-string tokentype_toString( tokentype_t type ) {
-	switch( type ) {
-		default:
-		case INVALID: 	return "INVALID"; 
-		case INTNUM: 	return "INTNUM";
-		case REALNUM: 	return "REALNUM";
-		case ID: 		return "ID";
-		case CONST: 	return "CONST";
-		case VAR: 		return "VAR";
-		case PROCEDURE: return "PROCEDURE";
-		case CALL: 		return "CALL";
-		case BEGIN: 	return "BEGIN";
-		case END: 		return "END";
-		case IF: 		return "IF";
-		case THEN: 		return "THEN";
-		case ELSE: 		return "ELSE";
-		case WHILE: 	return "WHILE";
-		case DO: 		return "DO";
-		case EQ: 		return "EQ";
-		case NE: 		return "NE";
-		case LT: 		return "LT";
-		case LE: 		return "LE";
-		case GT: 		return "GT";
-		case GE: 		return "GE";
-		case ASS: 		return "ASS";
-		case KOMMA: 	return "KOMMA";
-		case SEMICOLON: return "SEMICOLON";
-		case PLUS: 		return "PLUS";
-		case MINUS: 	return "MINUS";
-		case MULT: 		return "MULT";
-		case DIV: 		return "DIV";
-		case KLAUF: 	return "KLAUF";
-		case KLZU: 		return "KLZU";
-		case PROGEND: 	return "PROGEND";
-		case COLON: 	return "COLON";
-		case INT: 		return "INT";
-		case REAL: 		return "REAL";
-		case FI: 		return "FI";
-		case DONE: 		return "DONE";
+namespace token {
+	string toString( type_t type ) {
+		switch( type ) {
+			default:
+			case INVALID: 	return "INVALID"; 
+			case INTNUM: 	return "INTNUM";
+			case REALNUM: 	return "REALNUM";
+			case ID: 		return "ID";
+			case CONST: 	return "CONST";
+			case VAR: 		return "VAR";
+			case PROCEDURE: return "PROCEDURE";
+			case CALL: 		return "CALL";
+			case BEGIN: 	return "BEGIN";
+			case END: 		return "END";
+			case IF: 		return "IF";
+			case THEN: 		return "THEN";
+			case ELSE: 		return "ELSE";
+			case WHILE: 	return "WHILE";
+			case DO: 		return "DO";
+			case EQ: 		return "EQ";
+			case NE: 		return "NE";
+			case LT: 		return "LT";
+			case LE: 		return "LE";
+			case GT: 		return "GT";
+			case GE: 		return "GE";
+			case ASS: 		return "ASS";
+			case KOMMA: 	return "KOMMA";
+			case SEMICOLON: return "SEMICOLON";
+			case PLUS: 		return "PLUS";
+			case MINUS: 	return "MINUS";
+			case MULT: 		return "MULT";
+			case DIV: 		return "DIV";
+			case KLAUF: 	return "KLAUF";
+			case KLZU: 		return "KLZU";
+			case PROGEND: 	return "PROGEND";
+			case COLON: 	return "COLON";
+			case INT: 		return "INT";
+			case REAL: 		return "REAL";
+			case FI: 		return "FI";
+			case DONE: 		return "DONE";
+		}
 	}
 }
 
 std::ostream& operator<<( std::ostream& os, const token_t& symbol ) {
-	os << "symbol(" << tokentype_toString(symbol.type);
+	os << "symbol(" << token::toString(symbol.type);
 
 	switch ( symbol.type ) {
 		case INTNUM:
@@ -307,18 +285,4 @@ std::ostream& operator<<( std::ostream& os, const token_t& symbol ) {
 			break;
 	}
 	return os;
-}
-
-static int traceLevel = 0;
-void TRACE( lexan_t& lexan, string type ) {
-    if ( tracesw == 1 ) {
-        for ( int i = 0; i < traceLevel; i++ ) {
-            trace << '\t';
-        }
-        traceLevel++;
-        trace << "Zeile: " << lexan.lineno << " " << type << endl;
-    }
-}
-void TRACE_END() {
-    traceLevel--;
 }

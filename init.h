@@ -11,6 +11,8 @@
 #define INIT_H
 #endif
 
+#define MAX_SWITCH_LENGTH 10
 
-lexan_t* initialize(int argc, char** argv);		/* Compiler initialisieren */
-void stop();                                    /* Beenden */
+int indexOfArg( int argc, char** argv, const string small, const string big );
+char* safeArg( int argc, char** argv, int index );
+std::streambuf* openWriteFile( string file );

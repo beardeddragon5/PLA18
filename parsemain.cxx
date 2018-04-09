@@ -11,17 +11,51 @@
 #include "parser.h"
 #endif
 
+void help() {
+	cout << "Usage: parsemain [-t trace] <inputfile>" << endl;
+	cout << "Help:" << endl;
+	cout << "\t-t --trace: output the trace to the trace file";
+	exit( 1 );
+}
 
 // Mainprogramm für Parser
 
 int main(int argc, char** argv) {
 	// Compiler  intialisieren
-	lexan_t* lexan = initialize(argc, argv);
-	parser_t parser( *lexan );
+	if ( argc < 2 ) {
+		help();
+	}
+
+	char* tracefile = nullptr;
+	if ( argc > 2 && argc == 4 ) {
+		tracefile = argv[ 2 ];
+	} else {
+		help();
+	}
+
+	char* inputfile = argv[ argc - 1 ];
+	if ( access( inputfile, F_OK ) == -1 ) {
+		cerr << "Input file doesn't exist\n";
+		exit(1);
+	}
+
+	ostream error(nullptr);
+	error.rdbuf( cerr.rdbuf() );
+	ostream output(nullptr);
+	ifstream input( inputfile, ifstream::in );
+
+	ostream trace( nullptr );
+	trace.rdbuf( openWriteFile( tracefile ) );
+
+	ostream fsym( nullptr );
+	fsym.rdbuf( cout.rdbuf() );
+
+	lexan_t lexan( input, output, error );
+	parser_t parser( lexan, fsym, trace );
 
 	// Analyse PROGRAM
-	program( parser );
+	parser.program();
 	// Analyse korrekt beendet --> ST ausgeben; Abschlussarbeiten
-	stop();
+	printsymtab( parser, firstsym );
 	exit(0); 			// Erfolg
 }

@@ -36,6 +36,9 @@ parsemain: parsemain.o init.o error.o lexan.o symbol.o parser.o token.o
 	g++ -std=c++11 $(LDFLAGS) -o $@ $^
 
 
+runtime: runtime.o init.o error.o lexan.o symbol.o parser.o token.o
+	g++ -std=c++11 $(LDFLAGS) -o $@ $^
+
 # allgemeine Regel zur Erstellung eines Object-Files aus einer
 # C++ Quelldatei
 %.o: %.cxx

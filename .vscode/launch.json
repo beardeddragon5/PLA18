@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/lexmain",
-            "args": [ "-t", "trace.out", "-s", "sym.out", "pla_korrekt.tst", "output.out"],
+            "args": [ "pla_korrekt.tst" ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -22,13 +22,26 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/parsemain",
-            "args": [ "-t", "trace.out", "-s", "sym.out", "pla_korrekt.tst", "output.out"],
+            "args": [ "-t", "trace.out", "pla_korrekt.tst" ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb",
             "preLaunchTask": "Build-parsemain"
+        },
+        {
+            "name": "(lldb) Launch runtime",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/runtime",
+            "args": [ "-t", "trace.out", "-s", "sym.out", "pla_korrekt.tst", "output.out"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build-runtime"
         }
     ]
 }

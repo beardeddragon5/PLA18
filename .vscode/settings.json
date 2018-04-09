@@ -40,6 +40,22 @@
         "__tree": "cpp",
         "string": "cpp",
         "xmemory0": "cpp",
-        "xtr1common": "cpp"
+        "xtr1common": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "string_view": "cpp",
+        "cctype": "cpp",
+        "cstddef": "cpp",
+        "cstdio": "cpp",
+        "exception": "cpp",
+        "fstream": "cpp",
+        "iostream": "cpp",
+        "streambuf": "cpp",
+        "cstdlib": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp",
+        "new": "cpp",
+        "stdexcept": "cpp",
+        "sstream": "cpp"
     }
 }

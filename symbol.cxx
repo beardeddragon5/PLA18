@@ -17,7 +17,13 @@ wird ein Zeiger auf den Eintrag in lexemes abgelegt */
 #include "error.h"
 #endif
 
+#ifndef PARSER_H
+#include "parser.h"
+#endif
+
 #include <sstream>
+
+static int level = 0;
 
 char lexemes[STRMAX];		/* Feld f+r Namen der Bezeichner */
 
@@ -113,7 +119,12 @@ Ein Zeiger auf den einzutragenden Namen befindet sich in idname
 Rückgabe ist ein Zeiger auf den neuen ST-EIntrag
 *************/
 //st_entry * insert(int tok, char * name, int wert)
-st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
+st_entry* insert( parser_t* parser, symtype_t tok, string name, int wertaddr ) {
+	if ( parser == nullptr ) {
+		cerr << "parser of insert must be nonnull" << endl;
+		exit( 1 );
+	}
+	
 	int len;
 	st_entry neu;					/* Neuer ST-Eintrag  */
 	st_entry* lastentry;			/* Zeiger auf ST-EIntrag */
@@ -123,9 +134,9 @@ st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
 	len = strlen( idname ); 			/* Länge des Namens bestimmen */
 
 	if (actsym->anzahl >= SYMMAX)	/* MAximale Grösse Überschritten ? */
-		error( lexan, 28 );
+		parser->lexan.error( error::SYMBOL_TABLE_FULL );
 	if (lastchar +len+1 >= STRMAX)	/* Länge des Stringpuffers Überschritten ?*/
-		error( lexan, 29 );
+		parser->lexan.error( error::LEXEM_FIELD_FULL );
 
 	strcpy(lexemes+lastchar+1,idname);  /* Name in Feld lexemes ablegen */
 
@@ -144,14 +155,14 @@ st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
 
 		case INTIDENT:   /* Bei Identifikator vom Typ int */
 			neu.wertaddr = 0;
-			TRACE( lexan, "insert INTIDENT" );
-			TRACE_END();
+			parser->trace( "insert INTIDENT" );
+			parser->traceend();
 			break;
 
 		case REALIDENT:   /* Bei Identifikator vom Typ real  */
 			neu.wertaddr = 0;
-			TRACE( lexan, "insert REALIDENT" );
-			TRACE_END();
+			parser->trace( "insert REALIDENT" );
+			parser->traceend();
 			break;
 
 		case PROC: /* bei Prozedur: ST für lokale Deklarationen der neuen Prozedur
@@ -160,7 +171,7 @@ st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
 	 		break;
 
 		default:	/* falsche Eintragsart */
-			errortext( lexan, "falsche Eintragsrt in Symboltabelle\n" );
+			parser->lexan.error( "falsche Eintragsrt in Symboltabelle\n" );
 			break;
   }
 	actsym->eintrag[actsym->anzahl] = neu; /* Neuen Eintrag in ST eintragen */
@@ -175,34 +186,34 @@ st_entry* insert( lexan_t& lexan, symtype_t tok, string name, int wertaddr ) {
 	ostringstream stringStream;
   stringStream << "ST-Eintrag: " << lastentry->token << lastentry->name << lastentry->wertaddr;
 
-	TRACE( lexan, stringStream.str() );
-	TRACE_END();
+	parser->trace( stringStream.str() );
+	parser->traceend();
 
 	/* Zeiger auf Eintrag als Returnwert liefern */
 	return(lastentry);
 }
 
 /********** Ausgabe einer Teil-  Symboltabelle ( sptr) *************/
-void printsymtab(symtable *sptr) {
+void printsymtab( parser_t& parser, symtable *sptr) {
   int i;
 	st_entry *act;
 
-	fsym << "\nAnzahl der Einträge:" << sptr->anzahl << endl;
-	fsym << "Blockniveau:" << sptr->level << endl;
+	parser.fsym << "\nAnzahl der Einträge:" << sptr->anzahl << endl;
+	parser.fsym << "Blockniveau:" << sptr->level << endl;
 
   /* alle Einträge der ST ausgeben */
 	for(i = 0; i <sptr->anzahl; i++) {
     act =&( sptr->eintrag[i]);
-    fsym << "Eintrag-Nr:" << i + 1;
+    parser.fsym << "Eintrag-Nr:" << i + 1;
 
 		/* Name, Art, Wert ausgeben */
-    fsym << "\t" << act->name << "\t" << act->token << "\t" << act->wertaddr << endl;
+    parser.fsym << "\t" << act->name << "\t" << act->token << "\t" << act->wertaddr << endl;
 
     /* Bei PROC-Einträgen --> zur Prozedur gehörende ST ausgeben */
 	  if(act->token == PROC) {
-      fsym << "\nSymboltabelle zu\t" << act->name << endl;
-      printsymtab(act->subsym);
-			fsym << "\nEnde Symboltabelle zu\t" << act->name << endl;
+      parser.fsym << "\nSymboltabelle zu\t" << act->name << endl;
+      printsymtab( parser, act->subsym);
+			parser.fsym << "\nEnde Symboltabelle zu\t" << act->name << endl;
 		}
   }
 }

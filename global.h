@@ -23,17 +23,3 @@ using namespace std;
 #define STRMAX		999			/* Länge des Stringfeldes */
 #define SYMMAX		20			/* Größe der Teil-Symboltabelle */
 
-
-/****************Typ und extern-Deklarationen***********************/
-
-extern ifstream fin;
-extern ostream fout, ferr, fsym, trace;
-
-extern int level;
-
-extern int tracesw;					/* Kennung, ob Trace gewünscht */
-
-
-/******************** Prototypen für Prozeduren *******************/
-
-

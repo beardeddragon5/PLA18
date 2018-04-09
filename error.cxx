@@ -25,70 +25,64 @@ verwendet werden, die den angegebenen Text ausgibt
 #include "lexan.h"
 #endif
 
+#ifndef ERROR_H
+#include "error.h"
+#endif
+
 /***************** Fehlertexte **********************/
 
-string errtxt[] = {
-/*0*/	"Undefined Syntaxerror ",
-/*1*/	"'='erwartet anstelle von ':=' ",
-/*2*/	"Integer-Konstante nach = erwartet ",
-/*3*/	" = nach Idenitikator erwartet ",
-/*4*/	"Nach const,var,procedure Idenifikator erwartet",
-/*5*/	" ';' oder ',' fehlt ",
-/*6*/	"Statement oder Deklaration erwartet ",
-/*7*/	"Falsches Symbol nach Statement im Block",
-/*8*/	"Wiederholung erwartet",
-/*9*/	"Falsche Benutzung eines Symbols in Statement",
-/*10*/	"Identifikator nicht deklariert",
-/*11*/	"Keine Zuweisungen an Konstante oder Prozedurnamen zulässig",
-/*12*/	"Wertzuweisungsoperator ist ':=' ",
-/*13*/	"Nach call ist Identifikator erwartet ",
-/*14*/	"Konstante oder Variable in call nicht erlaubt",
-/*15*/	"then erwartet",
-/*16*/	"end oder ';' erwartet ",
-/*17*/	"do erwartet ",
-/*18*/	"Falsches Symbol nach Statement",
-/*19*/	"Vergleichsoperator erwartet",
-/*20*/	"Prozedurname in Ausdruck nicht erlaubt",
-/*21*/	" ')' fehlt ",
-/*22*/	" Symbol nach Faktor nicht erlaubt",
-/*23*/	"Ausdruck darf nicht mit diesem Symbol beginnen",
-/*24*/	"Zahl zu groß ",
-/*25*/	"Programm zu groß",
-/*26*/	"Prozedurschachtelung zu tief",
-/*27*/	"kein Faktor: Name oder Konstante oder ( E) ",
-/*28*/	" Symboltabelle voll",
-/*29*/	"Lexemfeld voll",
-/*30*/	"Statement erwartet" ,
-/*31*/	"Korrektes Programmende fehlt",
-/*32*/	" unzulässiges Eingabezeichen (Scanner)",
-/*33*/   "Nach PROGRAM noch Symbole in Eingabedatei",
-/*34*/	"Identifikator doppelt deklariert",
-/*35*/	"Doppelpunkt erwartet",
-/*36*/	"Unzulässiger Typ",
-/*37*/  "Falsche Eintragsart in Symboltabelle",
-/*38*/	"Keine korrekte reelle Konstante ",
-/*39*/	" fi fehlt",
-/*40*/	" Var erwartet",
-/*41*/	" ':' erwartet",
-/*42*/	" Variable bereits deklariert",
-/*43*/  "const can not be assigned"
+
+#include <map>
+
+using namespace error;
+map<error_t, string> errtext = {
+	{ EXPECTED_EQUAL, "expected '=' character" },
+	{ EXPECTED_ASS, "expected ':='" },
+	{ EXPECTED_RATIONAL_OPERATOR, "expected comparision operator" },
+	{ EXPECTED_ID, "expected identifier" },
+	{ EXPECTED_END, "expected 'end'" },
+	{ EXPECTED_THEN, "expected 'then'"},
+	{ EXPECTED_IF, "expected 'if'"},
+	{ EXPECTED_DO, "expected 'do'"},
+	{ EXPECTED_SEMICOLON, "expected ';'"},
+	{ EXPECTED_VAR, "expected 'var'"},
+	{ EXPECTED_COLON, "expected ':'"},
+	{ EXPECTED_TYPE, "expected 'int' or 'real'"},
+	{ EXPECTED_KOMMA, "expected ','"},
+	{ EXPECTED_CONST, "expected 'const'"},
+	{ EXPECTED_EQ, "expected '='"},
+	{ EXPECTED_INTNUM, "expected integer value"},
+	{ EXPECTED_PROGEND, "expected '$'"},
+	{ EXPECTED_PROGEND, "expected eof"},
+	{ INVALID_CHARACTER, "invalid character" },
+	{ SYMBOL_TABLE_FULL, "symbol table is full" },
+	{ LEXEM_FIELD_FULL, "lexem field is full" },
+	{ IDENTIFIER_NOT_DECLARED, "identifier not declared" },
+	{ IDENTIFIER_ALREADY_DECLARED, "identifier allready declared" },
+	{ NO_FACTOR, "no factor specified by ebnf" },
+	{ NO_STATEMENT, "no statement specified by ebnf" },
+	{ IDENTFIER_TO_BIG, "identifier to big" },
+	{ NUMBER_TO_BIG, "number to big" },
+	{ PROCDURE_IN_EXPRESSION_NOT_ALLOWED, "procedure in expression not allowed" },
+	{ CONST_READONLY, "const is readonly" },
+	{ PROCEDURE_NOT_ASSINABLE, "procedure is not assinable" }
 };
 
 /***************** Fehlerfunktion **********************/
 
 /* Funktion gibt den der Nummer nr entsprechenden Fehlertext aus */
-void error( lexan_t& lexan, int nr ) {
-	ferr << "Zeile" << lexan.lineno << errtxt[nr] << endl;
+void lexan_t::error( error::error_t nr ) {
+	this->err << "Zeile" << this->lineno << errtext[nr] << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Fehlertext aus */
-void errortext( lexan_t& lexan, string text) {
-	ferr << "Zeile" << lexan.lineno << text << endl;
+void lexan_t::error( string text ) {
+	this->err << "Zeile" << this->lineno << text << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Warnungstext aus */
-void warningtext( lexan_t& lexan, string text ) {
-	ferr << "Zeile" << lexan.lineno << text << endl;
+void lexan_t::warning( string text ) {
+	this->err << "Zeile" << this->lineno << text << endl;
 }
