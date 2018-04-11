@@ -22,14 +22,14 @@ void help() {
 
 int main(int argc, char** argv) {
 	// Compiler  intialisieren
-	if ( argc < 2 ) {
+	if ( argc == 1 ) {
 		help();
 	}
 
-	char* tracefile = nullptr;
+	char* tracefile = "";
 	if ( argc > 2 && argc == 4 ) {
 		tracefile = argv[ 2 ];
-	} else {
+	} else if ( argc != 2 ) {
 		help();
 	}
 
