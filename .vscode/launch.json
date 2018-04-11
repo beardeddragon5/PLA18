@@ -35,7 +35,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/runtime",
-            "args": [ "-t", "trace.out", "-s", "sym.out", "pla_korrekt.tst", "output.out"],
+            "args": [ "pla_korrekt.tst",  "87", "111", "114", "108", "100" ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

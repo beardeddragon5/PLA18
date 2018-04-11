@@ -430,6 +430,18 @@ void parser_t::program() {
 	// globale Symboltabelle  anlegen (firstsym
 	firstsym = create_newsym();
 
+	actsym = firstsym;
+
+	insert( this, INTIDENT, ASCII_OUT, 0 );
+	insert( this, INTIDENT, INT_OUT, 0 );
+	insert( this, REALIDENT, REAL_OUT, 0 );
+	insert( this, KONST, ARG_COUNT, 0 );
+	insert( this, INTIDENT, ARG_IDX, 0 );
+	insert( this, PROC, ARG_PROC, 0 );
+	insert( this, INTIDENT, ARG_OUT, 0 );
+
+	actsym = nullptr;
+
 	// Block muss folgen
 	block( firstsym );
 

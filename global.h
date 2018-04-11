@@ -13,6 +13,14 @@
 
 using namespace std;
 
+const string ASCII_OUT = "ascii";
+const string INT_OUT = "cint";
+const string REAL_OUT = "creal";
+const string ARG_COUNT = "argCount";
+const string ARG_IDX = "argIdx";
+const string ARG_OUT = "argOut";
+const string ARG_PROC = "arg";
+
 #define TRUE			1
 #define FALSE			0
 #define BSIZE			512			/* Puffergrösse */

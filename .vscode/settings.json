@@ -56,6 +56,15 @@
         "__nullptr": "cpp",
         "new": "cpp",
         "stdexcept": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "vector": "cpp",
+        "__bit_reference": "cpp",
+        "atomic": "cpp",
+        "bitset": "cpp",
+        "system_error": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "hash_map": "cpp",
+        "unordered_map": "cpp"
     }
 }
