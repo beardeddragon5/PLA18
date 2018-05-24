@@ -1,5 +1,5 @@
 	const c = 6;
-	var n: int,f: real; 
+	var n: int,f: real;
 	procedure test;
 		var i : int;
 		begin
@@ -8,13 +8,10 @@
 			while i <=n do
 					 begin
 						f := f+i;
-						i := i+1;  
+						i := i+1;
 					 end
-		end; 
+		end;
 	begin
 		n := c;
 		call test
-	end.
-	
-	
-		
+	end$

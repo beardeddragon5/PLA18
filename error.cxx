@@ -35,7 +35,7 @@ verwendet werden, die den angegebenen Text ausgibt
 #include <map>
 
 using namespace error;
-map<error_t, string> errtext = {
+map<error::error_t, std::string> errtext = {
 	{ EXPECTED_EQUAL, "expected '=' character" },
 	{ EXPECTED_ASS, "expected ':='" },
 	{ EXPECTED_RATIONAL_OPERATOR, "expected comparision operator" },
@@ -65,24 +65,25 @@ map<error_t, string> errtext = {
 	{ NUMBER_TO_BIG, "number to big" },
 	{ PROCDURE_IN_EXPRESSION_NOT_ALLOWED, "procedure in expression not allowed" },
 	{ CONST_READONLY, "const is readonly" },
-	{ PROCEDURE_NOT_ASSINABLE, "procedure is not assinable" }
+	{ PROCEDURE_NOT_ASSINABLE, "procedure is not assinable" },
+	{ IDENTIFIER_IS_NOT_CALLABLE, "identifier is not callable"},
 };
 
 /***************** Fehlerfunktion **********************/
 
 /* Funktion gibt den der Nummer nr entsprechenden Fehlertext aus */
 void lexan_t::error( error::error_t nr ) {
-	this->err << "Zeile" << this->lineno << errtext[nr] << endl;
+	this->err << "Zeile: " << this->lineno << " " << errtext[nr] << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Fehlertext aus */
 void lexan_t::error( string text ) {
-	this->err << "Zeile" << this->lineno << text << endl;
+	this->err << "Zeile: " << this->lineno << " "<< text << endl;
 	exit(1);
 }
 
 /* Funktion gibt den angegebenen  Warnungstext aus */
 void lexan_t::warning( string text ) {
-	this->err << "Zeile" << this->lineno << text << endl;
+	this->err << "Zeile: " << this->lineno << " " << text << endl;
 }

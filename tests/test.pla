@@ -1,0 +1,11 @@
+procedure abc;
+  procedure foo;
+    const a = 1, b=1,c=3;
+    var d:int, f : real, g : int ;
+    procedure bar;
+      if (a + d) + b * f - 10.0 = 3then f := 10.0 else f := 5 fi;
+    procedure foobar;
+      begin call foo; call bar; while 0 = 0do g := 0 end;
+    call foobar;
+  call foo
+;call abc$

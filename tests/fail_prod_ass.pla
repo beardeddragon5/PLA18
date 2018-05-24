@@ -1,0 +1,2 @@
+procedure abc;var i:int;i:=3;
+abc := 3$

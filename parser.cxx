@@ -10,7 +10,7 @@
 /**
  * factor checks for factor defined by EBNF
  * 		FACTOR ::= IDENT | NUMBER | ‘(‘ EXPRESSION ‘) ‘
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  * @return type of the factor returned
  */
@@ -32,11 +32,11 @@ void parser_t::factor(  ) {
 		case token::REALNUM: // found real constant
 			break;
 
-		case token::ID: // found identifier 
+		case token::ID: // found identifier
 			/**
 			 * identifier must be declared so
 			 * a valid entry in the symbol table must be set
-			 */	
+			 */
 			{
 				st_entry* found = lookup( lookahead.idname );
 				if ( found == nullptr ) {
@@ -53,7 +53,7 @@ void parser_t::factor(  ) {
 					case PROC:
 						// procedures are not allowed
 						lexan.error( error::PROCDURE_IN_EXPRESSION_NOT_ALLOWED );
-				}		
+				}
 			}
 			break;
 		default:
@@ -66,7 +66,7 @@ void parser_t::factor(  ) {
 /**
  * term checks for term defined by EBNF
  * 		TERM ::= FACTOR { '*' FACTOR | '/' FACTOR }*
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  * @return type of term
  */
@@ -87,7 +87,7 @@ void parser_t::term( ) {
 /**
  * exp checks for EXPRESSION defined by EBNF
  * 		EXPRESSION ::= TERM { '+' TERM | '-' TERM}*
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  * @return type of the expression
  */
@@ -107,14 +107,14 @@ void parser_t::exp() {
 /**
  * condition checks for CONDITION defined by EBNF
  * 		CONDITION ::= EXPRESSION  RELOP  EXPRESSION
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
 void parser_t::condition() {
 	trace( "condition" );
 
 	exp();
-	// after expression there must be a relop 
+	// after expression there must be a relop
 	switch( lookahead.type ) {
 		case token::EQ:
 		case token::NE:
@@ -140,7 +140,7 @@ void parser_t::condition() {
  *					  | begin STATEMENT { ';' STATEMENT }* end
  *					  | if CONDITION then STATEMENT [else STATEMENT ] fi
  *					  | while CONDITION do STATEMENT
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
 void parser_t::statement() {
@@ -150,8 +150,8 @@ void parser_t::statement() {
 		{
 			st_entry* entry = lookup( lookahead.idname );
 			if ( entry == nullptr ) {
-				lexan.error( error::IDENTIFIER_NOT_DECLARED ); 
-			}    
+				lexan.error( error::IDENTIFIER_NOT_DECLARED );
+			}
 			switch ( entry->token ) {
 				case KONST:
 					lexan.error( error::CONST_READONLY );
@@ -178,10 +178,10 @@ void parser_t::statement() {
 			}
 			st_entry* entry = lookup( lookahead.idname );
 			if ( entry == nullptr ) {
-				lexan.error( error::IDENTIFIER_NOT_DECLARED ); 
+				lexan.error( error::IDENTIFIER_NOT_DECLARED );
 			}
 			if ( entry->token != PROC ) {
-				lexan.error( error::EXPECTED_ID );
+				lexan.error( error::IDENTIFIER_IS_NOT_CALLABLE );
 			}
 			next();
 			break;
@@ -191,7 +191,7 @@ void parser_t::statement() {
 				next();
 				statement();
 			} while( lookahead == token::SEMICOLON );
-			
+
 			if ( lookahead != token::END ) {
 				lexan.error( error::EXPECTED_END );
 			}
@@ -206,7 +206,7 @@ void parser_t::statement() {
 			}
 			next();
 			statement();
-			
+
 			switch ( lookahead.type ) {
 				case token::FI:
 					next();
@@ -242,9 +242,9 @@ void parser_t::statement() {
 /**
  * procdecl checks for PROCDECL defined by EBNF
  * 		PROCDECL ::= {procedure IDENT ';' BLOCK ';' }*
- * 
+ *
  * found keyword procedure
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
 void parser_t::procdecl() {
@@ -261,7 +261,7 @@ void parser_t::procdecl() {
 		}
 
 		st_entry* neu = insert( this, PROC, lookahead.idname );
-		
+
 		next();
 
 		if ( lookahead != token::SEMICOLON ) {
@@ -281,9 +281,9 @@ void parser_t::procdecl() {
 /**
  * vardecl checks for VARDECL defined by EBNF
  * 		VARDECL ::= var IDENT ' : ' TYP  { ',' IDENT ' : ' TYP} *  ';'
- * 
+ *
  * found keyword var
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
 void parser_t::vardecl( ) {
@@ -303,7 +303,7 @@ void parser_t::vardecl( ) {
 			}
 			next();
 		}
-		
+
 		if ( lookahead != token::ID ) {
 			lexan.error( error::EXPECTED_ID );
 		}
@@ -322,7 +322,7 @@ void parser_t::vardecl( ) {
 			lexan.error( error::EXPECTED_TYPE );
 		}
 
-		symtype_t type = lookahead == token::INT ? INTIDENT : REALIDENT; 
+		symtype_t type = lookahead == token::INT ? INTIDENT : REALIDENT;
 
 		insert(this, type , idname );
 		next();
@@ -336,9 +336,9 @@ void parser_t::vardecl( ) {
 /**
  * constdecl checks for CONSTDECL defined by EBNF
  * 		CONSTDECL ::= const IDENT '=' INTNUMBER {',' IDENT '=' INTNUMBER } * ';'
- * 
+ *
  * found keyword const
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
 void parser_t::constdecl() {
@@ -387,14 +387,14 @@ void parser_t::constdecl() {
 /**
  * block checks for BLOCK defined by EBNF
  * 		BLOCK ::= [ CONSTDECL ] [ VARDECL ] PROCDECL STATEMENT
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
- * 
+ *
  * sets the current active symbolic table to newsym and resets it before execting the block
- * 
- * @param newsym 
+ *
+ * @param newsym
  *   is the new symbolic table. This can ether be the global table or the local table of a procedur
- * 
+ *
  */
 void parser_t::block( symtable* newsym ) {
 	trace( "block" );
@@ -421,7 +421,7 @@ void parser_t::block( symtable* newsym ) {
 /**
  * program checks for PROGRAM defined by EBNF
  * 		PROGRAM	::= BLOCK '$'
- * 
+ *
  * ne next symbol must be in set in parser and will set the next symbol to parser
  */
 void parser_t::program() {

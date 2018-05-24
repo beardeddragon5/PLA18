@@ -29,22 +29,23 @@ namespace error {
         EXPECTED_DONE,
 
         INVALID_CHARACTER,
-        
+
         SYMBOL_TABLE_FULL,
         LEXEM_FIELD_FULL,
-        
+
         IDENTIFIER_NOT_DECLARED,
         IDENTIFIER_ALREADY_DECLARED,
 
         NO_FACTOR,
         NO_STATEMENT,
-        
+
         IDENTFIER_TO_BIG,
         NUMBER_TO_BIG,
-        
+
         PROCDURE_IN_EXPRESSION_NOT_ALLOWED,
         CONST_READONLY,
         PROCEDURE_NOT_ASSINABLE,
-        
+
+        IDENTIFIER_IS_NOT_CALLABLE
     };
 }
