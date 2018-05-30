@@ -120,36 +120,68 @@ program: {
 			actsym = create_newsym();
 		} block "$";
 
-block://todo [ CONSTDECL ]
- 			[ VARDECL ]
- 			PROCDECL
- 			STATEMENT 
+block: constdecl vardecl prodecl statment
 
 
 constdecl: "const" constassings ";" | ;
-constass: ident "=" intnumber;
-constassings: constass	
-			| constassigns "," constass;		
+constass: IDENT "=" INTNUMBER {
+	symentry= lookup($1);
+	if (symentry != NULL) {
+		error(IDENTIFIER_ALREADY_DECLARED);
+	}
+	insert(KONST, $1, $3);
+};
+constassings: constass | constassings "," constass;
 
 
 vardecl: "var" varassings ";" | ;
-varass: ident ":" typ;
-varassings: varass	
-			| varassigns "," varass;
+varass: IDENT ":" typ {
+	symentry= lookup($1);
+	if (symentry != NULL) {
+		error(IDENTIFIER_ALREADY_DECLARED);
+	}
+
+	insert($3, $1, 0);
+};
+varassings: varass | varassings "," varass;
 
 
 
 prodecl: prodethird | ;
-prodeclass: "procedure" ident ";" block ";" ;
+prodeclass: "procedure" IDENT {
+		symentry = insert(PROC, $2, 0);
+		actsym = symentry->subsym;
+	} ";" block {
+		actsym = actsym->precsym;
+		} ";" {
+	};
 prodethird: prodethird prodeclass | prodeclass;
 
 
-
-statment: //todo ident ":=" expression	
-				|"call" ident
+statment: IDENT ":=" expression {
+					symentry= lookup($1);
+					if (symentry == NULL) {
+						error(IDENTIFIER_NOT_DECLARED);
+					}
+					if (symentry->type == KONST) {
+						error(CONST_READONLY);
+					}
+					if (symentry->type == PROC) {
+						error(PROCEDURE_NOT_ASSINABLE);
+					}
+				}
+				|"call" IDENT {
+					symentry= lookup($2);
+					if (symentry == NULL) {
+						error(IDENTIFIER_NOT_DECLARED);
+					}
+					if (symentry->type != PROC) {
+						error(IDENTIFIER_IS_NOT_CALLABLE);
+					}
+				}
 				|"begin" recstatment "end"
-				|"if" condition "then" statment constatment"fi" 
-				|"while" condition "do" statment
+				|"if" condition "then" statment constatment"fi"
+				|"while" condition "do" statment;
 
 recstatment: recstatment ";" statment | statment ;
 constatment: "else" statment | ;
@@ -171,24 +203,10 @@ factor:	IDENT {
 			if (symentry == NULL) {
 				error(IDENTIFIER_NOT_DECLARED);
 			}
+			if (symentry->type == PROC) {
+				error(PROCDURE_IN_EXPRESSION_NOT_ALLOWED);
+			}
 		} | INTNUMBER | REALNUMBER | "(" expression ")";
-
-ident: letter letterdigit;
-
-number:  intnumber | realnumber 
-
-intnumber:  digitass;
-
-realnumber: digitass "." digitass
-
-letter: "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"|"i"|"j"|"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|"w"|"x"|"y"|"z"| 
-		"A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L"|"M"|"N"|"O"|"P"|"Q"|"R"|"S"|"T"|"U"|"V"|"W"|"X"|"Y"|"Z";
-
-digit:  "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";
-
-digitass: digitass digit | digit;
-
-letterdigit: letterdigit letter | letterdigit digit | letter | digit;
 
 typ:	"int" { $$ = INTIDENT;} | "real" {$$ = REALIDENT; };
 

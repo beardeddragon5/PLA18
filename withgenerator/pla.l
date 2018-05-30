@@ -22,8 +22,7 @@
 
 /* Definitionen fuer flex */
 DIGIT		[0-9]
-LETTER	[A-Za-z]
-IDENT		LETTER{LETTER|DIGIT}*
+ID      [a-zA-Z][a-zA-Z0-9]*
 
 %s PROGRAM
 /*	---- Scanner-Regeln ----	*/
@@ -71,6 +70,7 @@ IDENT		LETTER{LETTER|DIGIT}*
 		error( NUMBER_TO_BIG ); // To big number
 	}
 	yylval.num = (int) val;
+	return INTNUMBER;
 }
 
 {DIGIT}+"."{DIGIT}* {
@@ -79,15 +79,20 @@ IDENT		LETTER{LETTER|DIGIT}*
 		error( NUMBER_TO_BIG ); // To big number
 	}
 	yylval.realnum = real;
+	return REALNUMBER;
 }
 
-IDENT {
+{ID} {
+	if (strlen(yytext) > 300) {
+		error(IDENTFIER_TO_BIG);
+	}
 	strncpy(yylval.idname, yytext, sizeof(yylval.idname));
+	return IDENT;
 }
 
 [ \t\r]		/* Whitespaces ignorieren */
 
-\n yylineno++;
+[\n] yylineno++;
 
 .		{	/* alle anderen Zeichen sind Fehler */
 			fprintf(stderr, "Zeile %d: ungueltiges Zeichen erkannt: %s\n", yylineno, yytext);
