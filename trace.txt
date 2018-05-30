@@ -1,0 +1,21 @@
+Zeile: 1 Programm
+	Zeile: 1 Block
+		Zeile: 1 Konstantendeklaration
+			Zeile: 1 ST-Eintrag: 310c6
+		Zeile: 2 Variablendeklaration
+			Zeile: 2 insert INTIDENT
+			Zeile: 2 ST-Eintrag: 320n0
+			Zeile: 2 insert REALIDENT
+			Zeile: 2 ST-Eintrag: 330f0
+		Zeile: 3 Procdeklaration
+			Zeile: 3 ST-Eintrag: 400test0
+			Zeile: 4 Block
+				Zeile: 4 Variablendeklaration
+					Zeile: 4 insert INTIDENT
+					Zeile: 4 ST-Eintrag: 320i0
+				Zeile: 5 Procdeklaration
+				Zeile: 5 Statement
+					Zeile: 6 Statement
+						Zeile: 6 Ausdruck
+							Zeile: 6 Term
+								Zeile: 6 Faktor

@@ -115,13 +115,44 @@
 %%
 /*	---- Grammatik und Aktionen ----	*/
 program: {
+
 			/* als erstes die Symboltabelle initialisieren */
 			actsym = create_newsym();
 		} block "$";
 
-block: "-"
-/* TODO */
+block://todo [ CONSTDECL ]
+ 			[ VARDECL ]
+ 			PROCDECL
+ 			STATEMENT 
 
+
+constdecl: "const" constassings ";" | ;
+constass: ident "=" intnumber;
+constassings: constass	
+			| constassigns "," constass;		
+
+
+vardecl: "var" varassings ";" | ;
+varass: ident ":" typ;
+varassings: varass	
+			| varassigns "," varass;
+
+
+
+prodecl: prodethird | ;
+prodeclass: "procedure" ident ";" block ";" ;
+prodethird: prodethird prodeclass | prodeclass;
+
+
+
+statment: //todo ident ":=" expression	
+				|"call" ident
+				|"begin" recstatment "end"
+				|"if" condition "then" statment constatment"fi" 
+				|"while" condition "do" statment
+
+recstatment: recstatment ";" statment | statment ;
+constatment: "else" statment | ;
 
 condition:	expression relop expression;
 
@@ -141,6 +172,23 @@ factor:	IDENT {
 				error(IDENTIFIER_NOT_DECLARED);
 			}
 		} | INTNUMBER | REALNUMBER | "(" expression ")";
+
+ident: letter letterdigit;
+
+number:  intnumber | realnumber 
+
+intnumber:  digitass;
+
+realnumber: digitass "." digitass
+
+letter: "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"|"i"|"j"|"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|"w"|"x"|"y"|"z"| 
+		"A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L"|"M"|"N"|"O"|"P"|"Q"|"R"|"S"|"T"|"U"|"V"|"W"|"X"|"Y"|"Z";
+
+digit:  "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9";
+
+digitass: digitass digit | digit;
+
+letterdigit: letterdigit letter | letterdigit digit | letter | digit;
 
 typ:	"int" { $$ = INTIDENT;} | "real" {$$ = REALIDENT; };
 
