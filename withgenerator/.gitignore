@@ -1,0 +1,12 @@
+*.d
+*.o
+lexmain
+out.txt
+parsemain
+runtime
+*.exe
+*.out
+pla.tab.c
+pla.tab.h
+lex.yy.c
+*.opp
